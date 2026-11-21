@@ -5,6 +5,9 @@
 @import "@fontsource/andika/latin-700.css";
 @import "@fontsource/andika/latin-ext-700.css";
 
+/* explicit source: the dev server runs from the parent folder and must see every file here (bug B5) */
+@source "./";
+
 @theme {
   --color-sky: #bfe8ff;
   --color-sky-deep: #7cc7f2;
