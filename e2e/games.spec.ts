@@ -9,6 +9,7 @@ const SCORED = [
   { id: 'puncte', island: 'bambus' },
   { id: 'abc', island: 'laguna' },
   { id: 'cifre', island: 'bambus' },
+  { id: 'xilofon', island: 'pestera' },
 ];
 
 for (const g of SCORED) {

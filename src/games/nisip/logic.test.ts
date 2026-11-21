@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { line, type Pt, resample } from './geometry';
-import { STROKES, UPPER } from './glyphs';
+import { DIGITS, STROKES, UPPER } from './glyphs';
 import { matchGlyphStroke, tolerancesForAge, validateStroke } from './logic';
 
 const guide = line([0.5, 0.1], [0.5, 0.9]);
@@ -49,7 +49,7 @@ describe('nisip: validateStroke', () => {
 
 describe('nisip: glyphs', () => {
   it('every glyph has ≥1 stroke; non-dot strokes have ≥4 points; all inside the box', () => {
-    for (const g of [...STROKES, ...UPPER]) {
+    for (const g of [...STROKES, ...UPPER, ...DIGITS]) {
       expect(g.strokes.length).toBeGreaterThan(0);
       for (const s of g.strokes) {
         if (g.id !== 'dots') expect(s.length).toBeGreaterThanOrEqual(2);
@@ -63,6 +63,10 @@ describe('nisip: glyphs', () => {
     }
   });
 
+  it('has the ten digits, 1 first', () => {
+    expect(DIGITS.map((d) => d.label).join('')).toBe('1234567890');
+  });
+
   it('covers the Romanian alphabet in teaching order, with Ș having its comma below', () => {
     expect(UPPER.map((g) => g.id).slice(0, 6)).toEqual(['A', 'M', 'U', 'N', 'I', 'E']);
     expect(UPPER).toHaveLength(31);
@@ -71,8 +75,8 @@ describe('nisip: glyphs', () => {
     expect(Math.min(...comma.map((p) => p.y))).toBeGreaterThan(0.9);
   });
 
-  it('each letter can be traced perfectly stroke by stroke (in order)', () => {
-    for (const g of UPPER) {
+  it('each letter and digit can be traced perfectly stroke by stroke (in order)', () => {
+    for (const g of [...UPPER, ...DIGITS]) {
       const done: number[] = [];
       for (let i = 0; i < g.strokes.length; i++) {
         const m = matchGlyphStroke(trace(g.strokes[i], 60), g, done, 7);

@@ -11,7 +11,7 @@ import { InkCanvas, type InkHandle, type Stroke } from '../../input/InkCanvas';
 import { DemoHand } from '../../ui/DemoHand';
 import type { LineId } from '../../voice/lines';
 import { type Pt, resample } from './geometry';
-import { type Glyph, glyphLabel, STROKES, UPPER } from './glyphs';
+import { DIGITS, type Glyph, glyphLabel, STROKES, UPPER } from './glyphs';
 import {
   checkpoints,
   matchGlyphStroke,
@@ -51,9 +51,69 @@ function Arrow({ pts, at }: { pts: Pt[]; at: number }) {
   );
 }
 
-export default function NisipGame({ level, onItem, voice, hints, registerTest, profileId }: GameProps) {
-  const skill = level.skill as NisipSkill;
-  const list = skill === 'trace.upper' ? UPPER : STROKES;
+type Kind = 'strokes' | 'upper' | 'digits';
+const LISTS: Record<Kind, Glyph[]> = { strokes: STROKES, upper: UPPER, digits: DIGITS };
+
+const KINDS: { kind: Kind; label: string; sample: string; voice: LineId; color: string }[] = [
+  { kind: 'strokes', label: 'Linii și valuri', sample: '〰', voice: 'nisip.pick.strokes', color: '#4cc9c0' },
+  { kind: 'upper', label: 'Litere', sample: 'A', voice: 'nisip.pick.letters', color: '#7e63b8' },
+  { kind: 'digits', label: 'Cifre', sample: '1', voice: 'nisip.pick.digits', color: '#5aa83a' },
+];
+
+/** The child chooses what to write: lines, letters or digits. The level only pre-selects the suggestion. */
+export default function NisipGame(props: GameProps) {
+  const suggested = (props.level.skill.split('.')[1] ?? 'strokes') as Kind;
+  const [kind, setKind] = useState<Kind | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: once
+  useEffect(() => {
+    void props.voice.prompt('nisip.choose');
+  }, []);
+  if (kind) return <Board {...props} kind={kind} onChangeKind={() => setKind(null)} />;
+  props.registerTest({ solve: () => setKind(suggested), fail: () => props.hints.next() });
+  return (
+    <div
+      className="flex h-full items-center justify-center gap-6 px-6 pb-6"
+      style={{ background: 'radial-gradient(circle at 30% 20%, #fff2cf 0%, #ffe3a8 45%, #f3cf8b 100%)' }}
+      data-testid="nisip-picker"
+    >
+      {KINDS.map((k, i) => (
+        <motion.button
+          key={k.kind}
+          type="button"
+          aria-label={k.label}
+          data-testid={`pick-${k.kind}`}
+          onClick={() => {
+            sfx.pop();
+            void props.voice.say(k.voice);
+            setKind(k.kind);
+          }}
+          initial={{ scale: 0, y: 30 }}
+          animate={{ scale: 1, y: 0 }}
+          transition={{ delay: i * 0.08, type: 'spring' }}
+          whileTap={{ scale: 0.9 }}
+          className={`flex h-[220px] w-[200px] flex-col items-center justify-center gap-2 rounded-[2.2rem] border-4 border-ink/80 shadow-[0_8px_0_rgba(59,42,74,0.3)] ${k.kind === suggested ? 'ring-8 ring-sun' : ''}`}
+          style={{ background: k.color }}
+        >
+          <span className="font-school text-[96px] leading-none font-bold text-white">{k.sample}</span>
+          <span className="text-xl font-semibold text-white">{k.label}</span>
+        </motion.button>
+      ))}
+    </div>
+  );
+}
+
+function Board({
+  level,
+  onItem,
+  voice,
+  hints,
+  registerTest,
+  profileId,
+  kind,
+  onChangeKind,
+}: GameProps & { kind: Kind; onChangeKind(): void }) {
+  const skill = `trace.${kind}` as NisipSkill;
+  const list = LISTS[kind];
   const rand = useRef(rng(randomSeed()));
   const [glyph, setGlyph] = useState<Glyph>(() => pickGlyph(list, boxesOf(profileId), rand.current));
   const [done, setDone] = useState<number[]>([]);
@@ -183,8 +243,16 @@ export default function NisipGame({ level, onItem, voice, hints, registerTest, p
       <div className="absolute bottom-2 left-4 portrait:hidden">
         <Marina size={190} mood={mood} />
       </div>
+      <button
+        type="button"
+        aria-label="Alege altceva de scris"
+        onClick={onChangeKind}
+        className="absolute top-2 right-4 z-10 grid size-[84px] place-items-center rounded-full border-4 border-ink/70 bg-white/90 font-school text-3xl font-bold"
+      >
+        {kind === 'digits' ? '1' : kind === 'upper' ? 'A' : '〰'}
+      </button>
       <div ref={boxRef} className="relative" style={{ width: box, height: box }} data-testid="sand">
-        {glyph.kind === 'upper' && (
+        {glyph.kind !== 'stroke' && (
           <span className="pointer-events-none absolute -top-2 right-2 font-school text-6xl font-bold text-ink/25">
             {glyphLabel(glyph)}
           </span>

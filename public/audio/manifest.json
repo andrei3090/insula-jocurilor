@@ -216,5 +216,15 @@
   "game.cifre.title": "1ffc8e922baf",
   "cifre.intro": "571f8a80ace3",
   "cifre.catch": "f2d2cc70c33a",
-  "cifre.howmany": "ed25b74d5d1a"
+  "cifre.howmany": "ed25b74d5d1a",
+  "nisip.choose": "dd8e183a7334",
+  "nisip.pick.strokes": "ec74d68dc3bb",
+  "nisip.pick.letters": "135b8ae504e5",
+  "nisip.pick.digits": "2ab93249b4e5",
+  "game.xilofon.title": "8f1aa41610dc",
+  "xilo.listen": "9710ec9df95b",
+  "xilo.your.turn": "47f045995139",
+  "xilo.follow": "d3c0ad822c92",
+  "xilo.song.frate": "761e8b7a3cde",
+  "xilo.song.steluta": "ce426e80b0ad"
 }

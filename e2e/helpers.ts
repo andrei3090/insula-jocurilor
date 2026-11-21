@@ -14,6 +14,12 @@ export async function openGame(page: Page, island: string, id: string) {
   // the game registers its test hooks once it is loaded
   await page.waitForFunction(() => typeof window.__test?.solve === 'function');
   await page.waitForTimeout(600);
+  // games that start with a choice (the sand: lines / letters / digits): take the first option
+  const picker = page.getByTestId('nisip-picker');
+  if (await picker.isVisible().catch(() => false)) {
+    await page.getByTestId('pick-strokes').click();
+    await page.waitForTimeout(800);
+  }
 }
 
 declare global {

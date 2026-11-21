@@ -1,7 +1,13 @@
 import type { LineId } from '../../voice/lines';
 import { arc, join, line, type Pt } from './geometry';
 
-export type Glyph = { id: string; label: string; voice: LineId; kind: 'stroke' | 'upper'; strokes: Pt[][] };
+export type Glyph = {
+  id: string;
+  label: string;
+  voice: LineId;
+  kind: 'stroke' | 'upper' | 'digit';
+  strokes: Pt[][];
+};
 
 // Unit box: capitals from T (top) to B (bottom); diacritics above T or below B.
 const T = 0.22;
@@ -171,6 +177,28 @@ export const UPPER: Glyph[] = [
   U('Q', [arc(0.5, M, 0.32, 0.34, -90, -450), line([0.58, 0.74], [0.84, 0.96])]),
   U('W', [line([0.1, T], [0.3, B], [0.5, 0.45], [0.7, B], [0.9, T])]),
   U('Y', [line([0.2, T], [0.5, 0.56]), line([0.8, T], [0.5, 0.56], [0.5, B])]),
+];
+
+const D = (n: number, strokes: Pt[][]): Glyph => ({
+  id: `D${n}`,
+  label: String(n),
+  voice: `num.${n}` as LineId,
+  kind: 'digit',
+  strokes,
+});
+
+/** Digits 0–9, written the way they are taught (start point and direction). */
+export const DIGITS: Glyph[] = [
+  D(1, [line([0.34, 0.36], [0.56, T], [0.56, B])]),
+  D(2, [join(arc(0.5, 0.42, 0.24, 0.2, -165, 15), line([0.73, 0.47], [0.26, B], [0.78, B]))]),
+  D(3, [join(arc(0.5, 0.39, 0.22, 0.17, -160, 90), arc(0.5, 0.73, 0.24, 0.17, -90, 160))]),
+  D(4, [line([0.6, T], [0.22, 0.68], [0.8, 0.68]), line([0.62, 0.42], [0.62, B])]),
+  D(5, [join(line([0.74, T], [0.34, T], [0.31, 0.52]), arc(0.48, 0.71, 0.26, 0.19, -125, 160))]),
+  D(6, [join(arc(0.52, 0.58, 0.25, 0.36, -70, -180), arc(0.51, 0.71, 0.24, 0.19, 180, 540))]),
+  D(7, [line([0.24, T], [0.76, T], [0.42, B])]),
+  D(8, [join(arc(0.5, 0.39, 0.19, 0.17, 90, 450), arc(0.5, 0.73, 0.23, 0.17, -90, 270))]),
+  D(9, [join(arc(0.5, 0.41, 0.22, 0.19, 10, -350), line([0.72, 0.44], [0.66, B]))]),
+  D(0, [arc(0.5, M, 0.25, 0.34, -90, -450)]),
 ];
 
 export const LABEL: Record<string, string> = { A2: 'Ă', A3: 'Â', I2: 'Î', S2: 'Ș', T2: 'Ț' };

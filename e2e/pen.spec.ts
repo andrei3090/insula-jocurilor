@@ -90,3 +90,12 @@ test('connect-the-dots: an S Pen stroke through the dots in order completes the 
   });
   await expect(page.getByTestId('bead-done')).toHaveCount(1, { timeout: 10000 });
 });
+
+test('sand writing: choosing "Cifre" shows a digit to trace', async ({ page }) => {
+  await start(page);
+  await page.getByTestId('island-laguna').click();
+  await page.getByTestId('card-nisip').click();
+  await page.getByTestId('pick-digits').click();
+  await expect(page.getByTestId('sand')).toBeVisible();
+  await expect(page.getByTestId('sand').locator('span').first()).toHaveText(/^[0-9]$/);
+});

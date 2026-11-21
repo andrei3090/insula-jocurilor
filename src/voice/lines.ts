@@ -218,6 +218,16 @@ export const lines = {
   'cifre.intro': 'Atinge cifra și vezi câte animăluțe apar!',
   'cifre.catch': 'Acum prinde aceeași cifră!',
   'cifre.howmany': 'Câte sunt? Atinge cifra potrivită.',
+  'nisip.choose': 'Ce vrei să scrii pe nisip? Linii, litere sau cifre?',
+  'nisip.pick.strokes': 'Linii și valuri!',
+  'nisip.pick.letters': 'Litere!',
+  'nisip.pick.digits': 'Cifre!',
+  'game.xilofon.title': 'Xilofonul lui Bruno',
+  'xilo.listen': 'Ascultă cu atenție, apoi cântă și tu la fel!',
+  'xilo.your.turn': 'Acum tu!',
+  'xilo.follow': 'Atinge bara care strălucește și cântăm împreună!',
+  'xilo.song.frate': 'Cântecul Frate Ioane!',
+  'xilo.song.steluta': 'Cântecul Steluța!',
 } as const;
 
 export type LineId = keyof typeof lines;

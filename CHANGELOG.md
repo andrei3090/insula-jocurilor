@@ -1,5 +1,10 @@
 # Ce e nou
 
+## 0.3.1 (22.11.2026)
+
+- Scrie pe nisip: copilul alege ce scrie, linii, litere sau cifre (0–9, cu ordinea corectă a liniilor).
+- Joc nou: Xilofonul lui Bruno (ascultă și repetă 2–5 note, cântece Frate Ioane și Steluța).
+
 ## 0.3.0 (22.11.2026)
 
 - Voci noi, naturale, pentru fiecare personaj (Pufi, Bruno, Cenușăreasa, Marina, Tavi).

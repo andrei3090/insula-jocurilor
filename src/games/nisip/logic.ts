@@ -1,7 +1,7 @@
 import { dist, distToPath, type Pt, pathLength, resample } from './geometry';
 import type { Glyph } from './glyphs';
 
-export const SKILLS = ['trace.strokes', 'trace.upper'] as const;
+export const SKILLS = ['trace.strokes', 'trace.upper', 'trace.digits'] as const;
 export type NisipSkill = (typeof SKILLS)[number];
 
 export type Tol = { r: number; d: number };
