@@ -42,13 +42,16 @@ export const clipKey = (id: string, text: string, engine: 'ioana' | 'gemini' = E
 /**
  * Gemini TTS casting (build-time only, see tools/voice-gemini.mjs). `voice` is the chosen prebuilt voice;
  * `candidates` are the options rendered as samples for the parent to choose from.
+ * Chosen 21.11.2026 from the measured samples (pitch, pitch range = expressiveness, syllables/s):
+ * Pufi Laomedeia (286 Hz, most expressive, 3.0/s), Bruno Achird, Cenușăreasa Achernar, Marina Autonoe (308 Hz),
+ * Tavi Algenib (133 Hz, deep and jolly).
  */
 export const GEMINI: Record<
   Speaker,
   { voice: string; candidates: string[]; style: string; countStyle: string; sample: string }
 > = {
   pufi: {
-    voice: 'Leda',
+    voice: 'Laomedeia',
     candidates: ['Leda', 'Laomedeia', 'Zephyr'],
     style:
       'a sweet, playful little panda girl talking to a 4-year-old: warm, cheerful, smiling, lively and expressive, clear and not too fast',
@@ -57,7 +60,7 @@ export const GEMINI: Record<
       'Bună! Eu sunt Pufi, ursulețul panda! Hai să numărăm împreună bețele de bambus. Unu, doi, trei! Bravo!',
   },
   bruno: {
-    voice: 'Puck',
+    voice: 'Achird',
     candidates: ['Puck', 'Achird', 'Fenrir'],
     style:
       'a friendly, curious little bear cub explorer: warm, excited, a bit funny, talking to a small child',
@@ -66,7 +69,7 @@ export const GEMINI: Record<
       'Salut! Eu sunt Bruno, ursulețul explorator! Hai în peșteră, am niște jocuri de gândit pentru tine!',
   },
   cenusareasa: {
-    voice: 'Vindemiatrix',
+    voice: 'Achernar',
     candidates: ['Vindemiatrix', 'Achernar', 'Sulafat'],
     style:
       'a gentle, kind fairy-tale princess talking to a small child: soft, warm, smiling and a little magical',
@@ -75,7 +78,7 @@ export const GEMINI: Record<
       'Bine ai venit la Castelul de cristal! Te așteptam la bal. Hai să găsim perechile pantofilor de cristal!',
   },
   marina: {
-    voice: 'Sadachbia',
+    voice: 'Autonoe',
     candidates: ['Sadachbia', 'Autonoe', 'Aoede'],
     style:
       'an adventurous, lively young girl sailor talking to a small child: bright, enthusiastic and joyful',

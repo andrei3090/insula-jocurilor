@@ -146,6 +146,31 @@ if (mode === 'install') {
     );
     process.exit(1);
   }
+  // sanity: a clip must sound like its text (catches a pause tag read aloud or a bad split)
+  const syllables = (t) => (t.match(/[aeiouăâîAEIOUĂÂÎ]/g) ?? []).length || 1;
+  const odd = Object.entries(lines)
+    .map(([id, t]) => {
+      const d = Number(
+        execFileSync('ffprobe', [
+          '-v',
+          'error',
+          '-show_entries',
+          'format=duration',
+          '-of',
+          'csv=p=0',
+          join(stageDir, `${id}.m4a`),
+        ]).toString(),
+      );
+      return { id, d, rate: syllables(t) / d };
+    })
+    .filter((c) => c.d < 0.25 || c.rate < 1.2 || c.rate > 8);
+  if (odd.length) {
+    console.log(
+      `suspicious clips (duration vs text), not installed: ${odd.map((c) => `${c.id} ${c.d.toFixed(1)}s`).join(', ')}`,
+    );
+    console.log('delete them from .voice-gemini/manifest.json and run batch again');
+    process.exit(1);
+  }
   const outDir = new URL('../public/audio/', import.meta.url).pathname;
   for (const id of Object.keys(lines))
     writeFileSync(join(outDir, `${id}.m4a`), readFileSync(join(stageDir, `${id}.m4a`)));
