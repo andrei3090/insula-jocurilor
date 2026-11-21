@@ -4,7 +4,7 @@ type Note = { f: number; t: number; d: number; type?: OscillatorType; g?: number
 
 function play(notes: Note[]) {
   const a = audio();
-  if (!a || a.ctx.state !== 'running') return;
+  if (a?.ctx.state !== 'running') return;
   const now = a.ctx.currentTime;
   for (const n of notes) {
     const osc = a.ctx.createOscillator();
@@ -23,7 +23,7 @@ function play(notes: Note[]) {
 
 function noise(duration: number, from: number, to: number, g = 0.12) {
   const a = audio();
-  if (!a || a.ctx.state !== 'running') return;
+  if (a?.ctx.state !== 'running') return;
   const len = Math.floor(a.ctx.sampleRate * duration);
   const buf = a.ctx.createBuffer(1, len, a.ctx.sampleRate);
   const data = buf.getChannelData(0);

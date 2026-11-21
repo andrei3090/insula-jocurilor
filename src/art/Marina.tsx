@@ -6,11 +6,11 @@ const TEAL = '#2bb3a3';
 const CORAL = '#ff7b6b';
 
 const star = (cx: number, cy: number, r: number) =>
-  Array.from({ length: 10 }, (_, i) => {
+  `${Array.from({ length: 10 }, (_, i) => {
     const a = -Math.PI / 2 + (i * Math.PI) / 5;
     const rr = i % 2 ? r * 0.45 : r;
     return `${i ? 'L' : 'M'}${(cx + Math.cos(a) * rr).toFixed(1)} ${(cy + Math.sin(a) * rr).toFixed(1)}`;
-  }).join(' ') + 'Z';
+  }).join(' ')}Z`;
 
 /** Marina: a little sea-voyager with two hair buns, a sun clip, a sailor top and a star compass. Original design. */
 export function Marina({
