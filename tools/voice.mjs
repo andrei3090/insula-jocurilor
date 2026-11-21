@@ -1,4 +1,4 @@
-// Generates one mono AAC clip per spoken line with the macOS "Ioana" (ro_RO) voice.
+// Generates one mono AAC clip per spoken line: macOS "Ioana" (ro_RO) + a per-character pitch shift.
 // Usage: npm run voice  (macOS only; needs `say` and `ffmpeg`). Unchanged lines are skipped.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -6,35 +6,55 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { lines } from '../src/voice/lines.ts';
+import { clipKey, SPEAKERS, speakerFor, VOICE } from '../src/voice/speakers.ts';
 
-const VOICE = 'Ioana';
-const RATE = '150';
 const outDir = new URL('../public/audio/', import.meta.url).pathname;
 const manifestPath = join(outDir, 'manifest.json');
+const hash = (s) => createHash('sha1').update(s).digest('hex').slice(0, 12);
 
-export const hashText = (text) =>
-  createHash('sha1').update(`${VOICE}|${RATE}|${text}`).digest('hex').slice(0, 12);
+/** pitch shift by resampling, then put the tempo back (and apply the character's speed) */
+export const filterFor = (id) => {
+  const { pitch, tempo } = SPEAKERS[speakerFor(id)];
+  const t = tempo / pitch;
+  const tempos = t < 0.5 ? [0.5, t / 0.5] : t > 2 ? [2, t / 2] : [t];
+  return [
+    `asetrate=22050*${pitch}`,
+    'aresample=44100',
+    ...tempos.map((x) => `atempo=${x.toFixed(4)}`),
+    'highpass=f=70',
+    'loudnorm=I=-16:TP=-1.5:LRA=11',
+  ].join(',');
+};
 
 mkdirSync(outDir, { recursive: true });
 const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {};
 const next = {};
 let made = 0;
 const tmp = join(tmpdir(), `insula-voice-${process.pid}.aiff`);
+const only = process.argv[2] ? new RegExp(process.argv[2]) : null;
 
 for (const [id, text] of Object.entries(lines)) {
-  const h = hashText(text);
+  const h = hash(clipKey(id, text));
   const file = join(outDir, `${id}.m4a`);
   next[id] = h;
   if (manifest[id] === h && existsSync(file)) continue;
-  execFileSync('say', ['-v', VOICE, '-r', RATE, '-o', tmp, text]);
+  if (only && !only.test(id)) {
+    next[id] = manifest[id];
+    continue;
+  }
+  execFileSync('say', ['-v', VOICE.name, '-r', String(VOICE.rate), '-o', tmp, text]);
   execFileSync('ffmpeg', [
     '-loglevel',
     'error',
     '-y',
     '-i',
     tmp,
+    '-af',
+    filterFor(id),
     '-ac',
     '1',
+    '-ar',
+    '44100',
     '-c:a',
     'aac',
     '-b:a',
@@ -44,9 +64,6 @@ for (const [id, text] of Object.entries(lines)) {
   made++;
 }
 rmSync(tmp, { force: true });
-
-for (const id of Object.keys(manifest)) {
-  if (!(id in next)) rmSync(join(outDir, `${id}.m4a`), { force: true });
-}
+for (const id of Object.keys(manifest)) if (!(id in next)) rmSync(join(outDir, `${id}.m4a`), { force: true });
 writeFileSync(manifestPath, `${JSON.stringify(next, null, 2)}\n`);
 console.log(`voice: ${made} new clip(s), ${Object.keys(next).length} total`);

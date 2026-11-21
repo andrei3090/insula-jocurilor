@@ -3,8 +3,10 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { lines } from './lines';
+import { clipKey, speakerFor } from './speakers';
 
-const hash = (text: string) => createHash('sha1').update(`Ioana|150|${text}`).digest('hex').slice(0, 12);
+const hash = (id: string, text: string) =>
+  createHash('sha1').update(clipKey(id, text)).digest('hex').slice(0, 12);
 const manifest: Record<string, string> = JSON.parse(readFileSync('public/audio/manifest.json', 'utf8'));
 
 function walk(dir: string): string[] {
@@ -14,10 +16,21 @@ function walk(dir: string): string[] {
   });
 }
 
+describe('character voices', () => {
+  it('each island speaks with its guide', () => {
+    expect(speakerFor('panda.give.3')).toBe('pufi');
+    expect(speakerFor('praise.1')).toBe('pufi');
+    expect(speakerFor('ursi.order')).toBe('bruno');
+    expect(speakerFor('memorie.pair')).toBe('cenusareasa');
+    expect(speakerFor('letter.S2')).toBe('marina');
+    expect(speakerFor('desen.intro')).toBe('tavi');
+  });
+});
+
 describe('voice clips', () => {
   it('every LineId has a clip with a matching text hash (run `npm run voice`)', () => {
     const stale = Object.entries(lines)
-      .filter(([id, text]) => manifest[id] !== hash(text) || !existsSync(`public/audio/${id}.m4a`))
+      .filter(([id, text]) => manifest[id] !== hash(id, text) || !existsSync(`public/audio/${id}.m4a`))
       .map(([id]) => id);
     expect(stale).toEqual([]);
   });
