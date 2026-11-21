@@ -24,8 +24,17 @@ const RULES: [RegExp, Speaker][] = [
 
 export const speakerFor = (id: string): Speaker => RULES.find(([re]) => re.test(id))?.[1] ?? 'pufi';
 
+/** Which generator made the clips in public/audio: 'ioana' (macOS, npm run voice) or 'gemini' (tools/voice-gemini.mjs). */
+export const ENGINE: 'ioana' | 'gemini' = 'ioana';
+export const GEMINI_MODEL = 'gemini-3.8-flash-tts';
+
 /** Everything that changes the sound of a clip (hashed into the clip manifest). */
-export const clipKey = (id: string, text: string) => {
+export const clipKey = (id: string, text: string, engine: 'ioana' | 'gemini' = ENGINE) => {
+  if (engine === 'gemini') {
+    const g = GEMINI[speakerFor(id)];
+    const style = id.startsWith('num.') || id === 'si' ? g.countStyle : g.style;
+    return `gemini|${GEMINI_MODEL}|${g.voice}|${style}|${text}`;
+  }
   const s = SPEAKERS[speakerFor(id)];
   return `${VOICE.name}|${VOICE.rate}|${s.pitch}|${s.tempo}|${text}`;
 };
