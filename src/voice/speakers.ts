@@ -29,3 +29,56 @@ export const clipKey = (id: string, text: string) => {
   const s = SPEAKERS[speakerFor(id)];
   return `${VOICE.name}|${VOICE.rate}|${s.pitch}|${s.tempo}|${text}`;
 };
+
+/**
+ * Gemini TTS casting (build-time only, see tools/voice-gemini.mjs). `voice` is the chosen prebuilt voice;
+ * `candidates` are the options rendered as samples for the parent to choose from.
+ */
+export const GEMINI: Record<
+  Speaker,
+  { voice: string; candidates: string[]; style: string; countStyle: string; sample: string }
+> = {
+  pufi: {
+    voice: 'Leda',
+    candidates: ['Leda', 'Laomedeia', 'Zephyr'],
+    style:
+      'a sweet, playful little panda girl talking to a 4-year-old: warm, cheerful, smiling, lively and expressive, clear and not too fast',
+    countStyle: 'a sweet little panda girl counting out loud happily, one clear word',
+    sample:
+      'Bună! Eu sunt Pufi, ursulețul panda! Hai să numărăm împreună bețele de bambus. Unu, doi, trei! Bravo!',
+  },
+  bruno: {
+    voice: 'Puck',
+    candidates: ['Puck', 'Achird', 'Fenrir'],
+    style:
+      'a friendly, curious little bear cub explorer: warm, excited, a bit funny, talking to a small child',
+    countStyle: 'a friendly bear cub counting, one clear word',
+    sample:
+      'Salut! Eu sunt Bruno, ursulețul explorator! Hai în peșteră, am niște jocuri de gândit pentru tine!',
+  },
+  cenusareasa: {
+    voice: 'Vindemiatrix',
+    candidates: ['Vindemiatrix', 'Achernar', 'Sulafat'],
+    style:
+      'a gentle, kind fairy-tale princess talking to a small child: soft, warm, smiling and a little magical',
+    countStyle: 'a gentle princess counting, one clear word',
+    sample:
+      'Bine ai venit la Castelul de cristal! Te așteptam la bal. Hai să găsim perechile pantofilor de cristal!',
+  },
+  marina: {
+    voice: 'Sadachbia',
+    candidates: ['Sadachbia', 'Autonoe', 'Aoede'],
+    style:
+      'an adventurous, lively young girl sailor talking to a small child: bright, enthusiastic and joyful',
+    countStyle: 'a lively young girl counting, one clear word',
+    sample: 'Ahoi! Eu sunt Marina, mica navigatoare! Hai să scriem pe nisip, înainte să vină valul!',
+  },
+  tavi: {
+    voice: 'Algenib',
+    candidates: ['Algenib', 'Charon', 'Enceladus'],
+    style:
+      'a huge, kind and funny sea giant talking to a small child: deep, jolly, chuckling warmly, slow and friendly',
+    countStyle: 'a jolly sea giant counting, one clear word',
+    sample: 'Ho, ho, ho! Eu sunt Tavi, uriașul mării! Hai în atelier, desenăm și colorăm tot ce vrei tu!',
+  },
+};

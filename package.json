@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.8",
+    "@google/genai": "^3.6.1",
     "@playwright/test": "1.65.1",
     "@tailwindcss/vite": "4.3.5",
     "@testing-library/dom": "10.4.2",
