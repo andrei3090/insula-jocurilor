@@ -1,9 +1,25 @@
+import { registerSW } from 'virtual:pwa-register';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { installBackHandler, useRouter } from './core/router';
+import { maybeApplyUpdate, setPendingUpdate } from './core/update';
 import './styles.css';
 
 document.addEventListener('contextmenu', (e) => e.preventDefault());
+installBackHandler();
+
+if ('serviceWorker' in navigator && import.meta.env.MODE !== 'development') {
+  const updateSW = registerSW({
+    onNeedRefresh() {
+      setPendingUpdate(updateSW);
+      maybeApplyUpdate(useRouter.getState().route.name);
+    },
+    onRegisteredSW(_url, reg) {
+      if (reg) setInterval(() => void reg.update(), 60 * 60 * 1000);
+    },
+  });
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

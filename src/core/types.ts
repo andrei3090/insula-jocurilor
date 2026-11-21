@@ -42,8 +42,11 @@ export type TestHooks = { solve(): void; fail(): void };
 
 export type GameProps = {
   level: SkillLevel;
-  /** report one finished item; the host scores it and moves the beads */
-  onItem(r: ItemResult): void;
+  /**
+   * Report one finished item (first-try = correct). The host scores it, moves the beads and praises;
+   * the promise resolves when the praise is over, so the game shows the next item after it.
+   */
+  onItem(r: ItemResult): Promise<void>;
   /** the game itself decides the round is over (unscored games: "Gata!" button) */
   onRoundEnd(): void;
   voice: VoiceApi;

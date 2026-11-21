@@ -56,3 +56,37 @@ describe('numberLine', () => {
     expect(() => numberLine(101)).toThrow();
   });
 });
+
+describe('voice never blocks a game', () => {
+  it('playBuffer settles even when the AudioContext never fires "ended"', async () => {
+    const { playBuffer } = await import('./voice');
+    const engine = await import('./engine');
+    const fake = {
+      ctx: {
+        state: 'running',
+        createBufferSource: () => ({ connect: () => {}, start: () => {}, onended: null, buffer: null }),
+      },
+      out: {},
+    };
+    vi.spyOn(engine, 'audio').mockReturnValue(fake as unknown as ReturnType<typeof engine.audio>);
+    vi.useFakeTimers();
+    let settled = false;
+    const p = playBuffer({ duration: 0.5 }).then(() => {
+      settled = true;
+    });
+    await vi.advanceTimersByTimeAsync(950);
+    await p;
+    expect(settled).toBe(true);
+    vi.useRealTimers();
+  });
+
+  it('playBuffer resolves at once when audio is suspended (not yet unlocked)', async () => {
+    const { playBuffer } = await import('./voice');
+    const engine = await import('./engine');
+    vi.spyOn(engine, 'audio').mockReturnValue({
+      ctx: { state: 'suspended' },
+      out: {},
+    } as unknown as ReturnType<typeof engine.audio>);
+    await expect(playBuffer({ duration: 3 })).resolves.toBeUndefined();
+  });
+});

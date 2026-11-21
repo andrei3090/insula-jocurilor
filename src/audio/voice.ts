@@ -39,16 +39,30 @@ export function preload(ids: readonly LineId[]) {
   for (const id of ids) void load(id);
 }
 
-function playBuffer(buf: AudioBuffer, t: number): Promise<void> {
+/** Plays one clip. Always settles: on end, or after its duration + 400 ms (a suspended or muted
+ *  AudioContext never fires `ended`, and a game must never wait forever on the voice). */
+export function playBuffer(buf: Pick<AudioBuffer, 'duration'>, t: number = token): Promise<void> {
   return new Promise((resolve) => {
     const a = audio();
-    if (!a || t !== token) return resolve();
-    const src = a.ctx.createBufferSource();
-    src.buffer = buf;
-    src.connect(a.out);
-    src.onended = () => resolve();
-    current = src;
-    src.start();
+    if (!a || t !== token || a.ctx.state !== 'running') return resolve();
+    let settled = false;
+    const done = () => {
+      if (!settled) {
+        settled = true;
+        resolve();
+      }
+    };
+    setTimeout(done, buf.duration * 1000 + 400);
+    try {
+      const src = a.ctx.createBufferSource();
+      src.buffer = buf as AudioBuffer;
+      src.connect(a.out);
+      src.onended = done;
+      current = src;
+      src.start();
+    } catch {
+      done();
+    }
   });
 }
 
