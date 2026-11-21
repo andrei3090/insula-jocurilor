@@ -1,0 +1,69 @@
+@import "tailwindcss";
+@import "@fontsource-variable/fredoka/wght.css";
+@import "@fontsource/andika/latin-400.css";
+@import "@fontsource/andika/latin-ext-400.css";
+@import "@fontsource/andika/latin-700.css";
+@import "@fontsource/andika/latin-ext-700.css";
+
+@theme {
+  --color-sky: #bfe8ff;
+  --color-sky-deep: #7cc7f2;
+  --color-lagoon: #4cc9c0;
+  --color-lagoon-deep: #1f9e95;
+  --color-sand: #ffe3a8;
+  --color-bamboo: #8fd16a;
+  --color-bamboo-deep: #5aa83a;
+  --color-cave: #b39ddb;
+  --color-cave-deep: #7e63b8;
+  --color-castle: #f8bbd0;
+  --color-castle-deep: #e57fa6;
+  --color-sun: #ffd166;
+  --color-coral: #ff8a80;
+  --color-ink: #3b2a4a;
+  --color-paper: #fffaf2;
+  --font-display: "Fredoka Variable", "Fredoka", ui-rounded, system-ui, sans-serif;
+  --font-school: "Andika", "Fredoka Variable", sans-serif;
+  --radius-blob: 2rem;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  overscroll-behavior: none;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button {
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.ink-surface {
+  touch-action: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
