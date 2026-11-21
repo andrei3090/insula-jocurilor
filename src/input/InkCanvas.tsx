@@ -31,6 +31,7 @@ type Props = {
   color?: string;
   size?: number;
   disabled?: boolean;
+  /** positioning and size of the surface; defaults to `relative h-full w-full` (do not combine with `relative`) */
   className?: string;
   label?: string;
   /** called when a stroke starts; return a clip path to keep the stroke inside a region */
@@ -316,7 +317,12 @@ export const InkCanvas = forwardRef<InkHandle, Props>(function InkCanvas(
   }, [schedule, redrawBase]);
 
   return (
-    <div ref={wrap} className={`ink-surface relative ${className ?? ''}`} role="img" aria-label={label}>
+    <div
+      ref={wrap}
+      className={`ink-surface ${className ?? 'relative h-full w-full'}`}
+      role="img"
+      aria-label={label}
+    >
       <canvas ref={base} className="pointer-events-none absolute inset-0 h-full w-full" />
       <canvas ref={live} data-testid="ink-live" className="ink-surface absolute inset-0 h-full w-full" />
     </div>

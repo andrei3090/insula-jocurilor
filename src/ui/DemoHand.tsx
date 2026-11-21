@@ -3,18 +3,25 @@ import { motion, useReducedMotion } from 'motion/react';
 type P = { x: number; y: number };
 
 /** An animated hand that shows the gesture: a tap at `from`, or a drag from `from` to `to`. Coordinates in px of the nearest positioned parent. */
-export function DemoHand({ from, to, loops = 2 }: { from: P; to?: P; loops?: number }) {
+export function DemoHand({ from, to, path, loops = 2 }: { from: P; to?: P; path?: P[]; loops?: number }) {
   const reduce = useReducedMotion();
-  const path = to
-    ? { x: [from.x, from.x, to.x, to.x], y: [from.y, from.y, to.y, to.y], scale: [1, 0.85, 0.85, 1] }
-    : { x: from.x, y: from.y, scale: [1, 0.8, 1, 0.8, 1] };
+  const motionPath = path?.length
+    ? { x: path.map((p) => p.x), y: path.map((p) => p.y), scale: 0.9 }
+    : to
+      ? { x: [from.x, from.x, to.x, to.x], y: [from.y, from.y, to.y, to.y], scale: [1, 0.85, 0.85, 1] }
+      : { x: from.x, y: from.y, scale: [1, 0.8, 1, 0.8, 1] };
   return (
     <motion.div
       data-testid="demo-hand"
       className="pointer-events-none absolute left-0 top-0 z-40"
       initial={{ x: from.x, y: from.y, opacity: 0 }}
-      animate={{ ...path, opacity: 1 }}
-      transition={{ duration: reduce ? 0 : 1.6, repeat: loops - 1, repeatDelay: 0.4, ease: 'easeInOut' }}
+      animate={{ ...motionPath, opacity: 1 }}
+      transition={{
+        duration: reduce ? 0 : path?.length ? 2.4 : 1.6,
+        repeat: loops - 1,
+        repeatDelay: 0.4,
+        ease: 'easeInOut',
+      }}
     >
       <svg viewBox="0 0 64 64" width={72} height={72} style={{ translate: '-18px -6px' }} aria-hidden="true">
         <path
