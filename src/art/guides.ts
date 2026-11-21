@@ -41,8 +41,8 @@ export const ISLANDS: Record<IslandId, IslandInfo> = {
   atelier: {
     id: 'atelier',
     name: 'Atelierul',
-    guide: 'pufi',
-    friend: 'bruno',
+    guide: 'tavi',
+    friend: 'pufi',
     sky: '#fff1d6',
     sea: '#ffd166',
   },
