@@ -16,7 +16,7 @@ describe('Romanian copy', () => {
   it('no cedilla s/t in src (use comma-below ș ț)', () => {
     const offenders = walk('src')
       .filter((f) => /\.(ts|tsx|css|json)$/.test(f))
-      .filter((f) => !f.endsWith('copy.test.ts'))
+      .filter((f) => !/\.test\.tsx?$/.test(f)) // tests may hold wrong letters on purpose
       .filter((f) => CEDILLA.test(readFileSync(f, 'utf8')));
     expect(offenders).toEqual([]);
   });

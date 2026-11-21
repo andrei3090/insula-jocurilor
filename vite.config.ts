@@ -36,9 +36,16 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,m4a,json}'],
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
         cleanupOutdatedCaches: true,
+        // the parent app has its own page; never answer its navigations with the child app
+        navigateFallbackDenylist: [/\/parinti\//],
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      input: { main: 'index.html', parinti: 'parinti/index.html' },
+    },
+  },
   test: {
     environment: 'happy-dom',
     setupFiles: ['src/test-setup.ts'],
