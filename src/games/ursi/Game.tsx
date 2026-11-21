@@ -24,6 +24,7 @@ export default function UrsiGame({ level, onItem, voice, hints, registerTest }: 
   const rand = useRef(rng(randomSeed()));
   const [item, setItem] = useState<UrsiItem>(() => makeItem(skill, rand.current));
   const [placed, setPlaced] = useState<number[]>([]); // sizes already placed
+  const placedRef = useRef<number[]>([]); // same, updated synchronously (fast double taps)
   const [selected, setSelected] = useState<number | null>(null);
   const [shake, setShake] = useState<number | null>(null);
   const [moods, setMoods] = useState<Record<number, Mood>>({});
@@ -64,8 +65,27 @@ export default function UrsiGame({ level, onItem, voice, hints, registerTest }: 
     hints.next();
   };
 
-  const place = async (size: number) => {
-    const next = [...placed, size];
+  const complete = async () => {
+    await new Promise((r) => setTimeout(r, 700));
+    await onItem({
+      skill,
+      correct: mistakes.current === 0,
+      hintsUsed: hints.rung,
+      ms: Date.now() - started.current,
+    });
+    mistakes.current = 0;
+    started.current = Date.now();
+    hints.reset();
+    placedRef.current = [];
+    setPlaced([]);
+    setMoods({});
+    setItem((it) => makeItem(skill, rand.current, it.thing));
+  };
+
+  const place = (size: number) => {
+    if (placedRef.current.includes(size)) return;
+    const next = [...placedRef.current, size];
+    placedRef.current = next;
     setPlaced(next);
     setSelected(null);
     setDemo(null);
@@ -74,27 +94,13 @@ export default function UrsiGame({ level, onItem, voice, hints, registerTest }: 
       setMoods((m) => ({ ...m, [size]: 'happy' }));
       void voice.say(BEARS.find((b) => b.size === size)!.line);
     }
-    if (next.length === n) {
-      await new Promise((r) => setTimeout(r, 700));
-      await onItem({
-        skill,
-        correct: mistakes.current === 0,
-        hintsUsed: hints.rung,
-        ms: Date.now() - started.current,
-      });
-      mistakes.current = 0;
-      started.current = Date.now();
-      hints.reset();
-      setPlaced([]);
-      setMoods({});
-      setItem(makeItem(skill, rand.current, item.thing));
-    }
+    if (next.length === n) void complete();
   };
 
   const tapObject = (size: number) => {
     if (placed.includes(size)) return;
     if (item.mode === 'order') {
-      if (isNextInOrder(item.sizes, placed, size)) void place(size);
+      if (isNextInOrder(item.sizes, placedRef.current, size)) place(size);
       else miss(size);
       return;
     }
@@ -104,7 +110,7 @@ export default function UrsiGame({ level, onItem, voice, hints, registerTest }: 
 
   const tapBear = (bearSize: number) => {
     if (item.mode !== 'match' || selected === null || placed.includes(bearSize)) return;
-    if (matchOk(selected, bearSize)) void place(selected);
+    if (matchOk(selected, bearSize)) place(selected);
     else miss(selected);
   };
 
@@ -119,16 +125,14 @@ export default function UrsiGame({ level, onItem, voice, hints, registerTest }: 
     if (item.mode === 'match') {
       const b = Number(el.dataset.bear);
       if (Number.isNaN(b)) return;
-      if (matchOk(size, b)) void place(size);
+      if (matchOk(size, b)) place(size);
       else miss(size);
     } else tapObject(size);
   };
 
   registerTest({
     solve: () => {
-      void (async () => {
-        for (const s of [...remaining].sort((a, b) => a - b)) await place(s);
-      })();
+      for (const s of [...remaining].sort((a, b) => a - b)) place(s);
     },
     fail: () => {
       const wrong = item.mode === 'order' ? Math.max(...remaining) : remaining[0];

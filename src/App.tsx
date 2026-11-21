@@ -51,7 +51,8 @@ export function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <AnimatePresence mode="wait" initial={false}>
+      {/* no initial={false} here: it propagates to every child and silently disables their mount animations (bug B9) */}
+      <AnimatePresence mode="wait">
         <motion.div
           key={keyOf(route)}
           className="h-full w-full"

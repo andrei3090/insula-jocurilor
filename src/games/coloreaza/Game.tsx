@@ -75,7 +75,12 @@ export default function ColoreazaGame({ voice, registerTest, profileId }: GamePr
     if (!el) return;
     const ro = new ResizeObserver(() => {
       const r = el.getBoundingClientRect();
-      setSize(Math.floor(Math.min(r.width - 140, r.height - 20)));
+      const portrait = r.height > r.width;
+      setSize(
+        Math.floor(
+          portrait ? Math.min(r.width - 24, r.height - 300) : Math.min(r.width - 300, r.height - 20),
+        ),
+      );
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -179,7 +184,7 @@ export default function ColoreazaGame({ voice, registerTest, profileId }: GamePr
     );
 
   return (
-    <div ref={area} className="flex h-full items-center justify-center gap-4 px-4 pb-4">
+    <div ref={area} className="flex h-full items-center justify-center gap-4 px-4 pb-4 portrait:flex-col">
       <div className="grid grid-cols-2 gap-2 portrait:grid-cols-5" data-testid="palette">
         {PALETTE.map((p) => (
           <motion.button
@@ -207,7 +212,7 @@ export default function ColoreazaGame({ voice, registerTest, profileId }: GamePr
         <Sheet page={page} size={size - 30} />
         {saved > 0 && <StarBurst key={saved} />}
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 portrait:flex-row">
         <BigButton label="Alt desen" size={86} round onPress={() => setPage(null)}>
           <svg viewBox="0 0 64 64" width={46} height={46} aria-hidden="true">
             <rect

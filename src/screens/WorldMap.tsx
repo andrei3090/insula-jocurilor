@@ -40,8 +40,9 @@ export function WorldMap() {
                 go({ name: 'island', island: id });
               }}
               className="relative flex basis-[31%] flex-col items-center portrait:basis-[46%]"
-              animate={reduce ? undefined : { y: [0, -8, 0] }}
-              transition={{ duration: 3 + i * 0.4, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+              initial={reduce ? false : { y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: i * 0.06, type: 'spring', stiffness: 220, damping: 18 }}
               whileTap={{ scale: 0.92 }}
             >
               <div className="relative">

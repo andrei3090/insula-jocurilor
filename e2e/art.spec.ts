@@ -5,6 +5,7 @@ import { expect, test } from '@playwright/test';
 test('eyes blink in place and arms wave from the shoulder', async ({ page }) => {
   await page.goto('./#art');
   await page.waitForSelector('[data-part=eyes]');
+  await page.waitForTimeout(800); // let the screen transition settle
   const r = await page.evaluate(async () => {
     const pt = (g: SVGGraphicsElement, fx: number, fy: number) => {
       const bb = g.getBBox();
