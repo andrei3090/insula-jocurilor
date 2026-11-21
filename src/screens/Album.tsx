@@ -10,6 +10,9 @@ import { STICKERS } from '../core/stickers';
 import { BigButton } from '../ui/BigButton';
 import { CheckIcon, HouseIcon, TrashIcon } from '../ui/icons';
 
+/** Stable empty list: a selector must not return a new [] each render (React would loop). */
+const NONE: string[] = [];
+
 function DrawingCard({ d, onDeleted }: { d: Drawing; onDeleted(): void }) {
   const [url] = useState(() => URL.createObjectURL(d.blob));
   const [confirm, setConfirm] = useState(false);
@@ -48,7 +51,7 @@ function DrawingCard({ d, onDeleted }: { d: Drawing; onDeleted(): void }) {
 export function Album() {
   const go = useRouter((s) => s.go);
   const profileId = useProfile((s) => s.activeId);
-  const owned = useProgress((s) => s.stickers[profileId] ?? []);
+  const owned = useProgress((s) => s.stickers[profileId] ?? NONE);
   const [drawings, setDrawings] = useState<Drawing[]>([]);
   const refresh = () => void listDrawings(profileId).then(setDrawings);
   // biome-ignore lint/correctness/useExhaustiveDependencies: load once per profile
@@ -71,6 +74,13 @@ export function Album() {
           {owned.length} / {STICKERS.length}
         </span>
       </header>
+      {drawings.length > 0 && (
+        <div className="flex gap-6 overflow-x-auto px-8 pt-2 pb-4">
+          {drawings.map((d) => (
+            <DrawingCard key={d.id} d={d} onDeleted={refresh} />
+          ))}
+        </div>
+      )}
       <div className="mx-auto grid max-w-5xl grid-cols-6 gap-4 px-6 py-4 portrait:grid-cols-4">
         {STICKERS.map((s, i) => {
           const have = owned.includes(s);
@@ -93,13 +103,6 @@ export function Album() {
           );
         })}
       </div>
-      {drawings.length > 0 && (
-        <div className="flex gap-6 overflow-x-auto px-8 pt-4 pb-10">
-          {drawings.map((d) => (
-            <DrawingCard key={d.id} d={d} onDeleted={refresh} />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

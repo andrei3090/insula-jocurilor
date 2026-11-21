@@ -41,6 +41,8 @@ type Props = {
   onStrokeEnd?(s: Stroke): void;
   /** keep strokes on the canvas (false: the game clears them itself, e.g. tracing) */
   persist?: boolean;
+  /** tap mode: a touch calls onTap instead of drawing (e.g. placing a stamp) */
+  onTap?: (x: number, y: number) => void;
 };
 
 const RAINBOW = ['#ff5f6d', '#ffa24c', '#ffd84c', '#6fd36f', '#4cc9f0', '#7b6cff', '#d86cff'];
@@ -99,6 +101,7 @@ export const InkCanvas = forwardRef<InkHandle, Props>(function InkCanvas(
     onStrokeMove,
     onStrokeEnd,
     persist = true,
+    onTap,
   },
   ref,
 ) {
@@ -120,8 +123,20 @@ export const InkCanvas = forwardRef<InkHandle, Props>(function InkCanvas(
     onStrokeMove,
     onStrokeEnd,
     persist,
+    onTap,
   });
-  props.current = { tool, color, size, disabled, clipAt, onStrokeStart, onStrokeMove, onStrokeEnd, persist };
+  props.current = {
+    tool,
+    color,
+    size,
+    disabled,
+    clipAt,
+    onStrokeStart,
+    onStrokeMove,
+    onStrokeEnd,
+    persist,
+    onTap,
+  };
 
   const redrawBase = useCallback(() => {
     const ctx = ctxOf(base.current);
@@ -249,6 +264,10 @@ export const InkCanvas = forwardRef<InkHandle, Props>(function InkCanvas(
         /* synthetic events */
       }
       const first = pt(e);
+      if (p.onTap) {
+        p.onTap(first[0], first[1]);
+        return;
+      }
       const isPen = e.pointerType === 'pen';
       if (p.tool === 'eraser' && base.current) {
         const snap = document.createElement('canvas');
