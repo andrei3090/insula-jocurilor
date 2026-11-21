@@ -25,10 +25,20 @@ export function Blink({ children }: { children: ReactNode }) {
   );
 }
 
-export function Eye({ x, y, r = 8, iris = INK }: { x: number; y: number; r?: number; iris?: string }) {
+export function Eye({
+  x,
+  y,
+  r = 8,
+  eyeColor = INK,
+}: {
+  x: number;
+  y: number;
+  r?: number;
+  eyeColor?: string;
+}) {
   return (
     <g>
-      <circle cx={x} cy={y} r={r} fill={iris} />
+      <circle cx={x} cy={y} r={r} fill={eyeColor} />
       <circle cx={x + r * 0.35} cy={y - r * 0.35} r={r * 0.32} fill="#fff" />
       <circle cx={x - r * 0.3} cy={y + r * 0.35} r={r * 0.15} fill="#fff" />
     </g>

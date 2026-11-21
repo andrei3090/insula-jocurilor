@@ -80,8 +80,8 @@ export function Marina({
           <circle r={7} fill="#ffd166" {...thin} strokeWidth={2.5} />
         </g>
         <Blink>
-          <Eye x={87} y={72} r={6.5} iris="#3a2418" />
-          <Eye x={113} y={72} r={6.5} iris="#3a2418" />
+          <Eye x={87} y={72} r={6.5} eyeColor="#3a2418" />
+          <Eye x={113} y={72} r={6.5} eyeColor="#3a2418" />
         </Blink>
         <path d="M91 84 Q100 94 109 84 Z" fill="#c8455a" {...thin} strokeWidth={2.5} />
         <Blush x={80} y={82} rx={7} ry={4.5} />

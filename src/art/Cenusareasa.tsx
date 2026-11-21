@@ -97,8 +97,8 @@ export function Cenusareasa({ size, mood = 'idle', className, title = 'Cenușăr
           {...thin}
         />
         <Blink>
-          <Eye x={87} y={64} r={6.5} iris="#6b3f2a" />
-          <Eye x={113} y={64} r={6.5} iris="#6b3f2a" />
+          <Eye x={87} y={64} r={6.5} eyeColor="#6b3f2a" />
+          <Eye x={113} y={64} r={6.5} eyeColor="#6b3f2a" />
         </Blink>
         <path d="M80 54 Q87 50 93 53 M107 53 Q113 50 120 54" fill="none" {...thin} strokeWidth={2.5} />
         <path d="M93 78 Q100 84 107 78" fill="none" {...thin} />
