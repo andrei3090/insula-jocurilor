@@ -1,5 +1,15 @@
 # Ce e nou
 
+## 0.4.0 (22.11.2026)
+
+- Insula · Părinți, cu AI mai bun:
+  - Răspunsuri în ~6 secunde (înainte ~1 minut); modul „Detaliat” rămâne în Setări.
+  - Profilul copilului (poreclă, ce-i place, ce învață acum, ce evităm), folosit în toate ideile și poveștile.
+  - Butoane „Ajustează cu AI” pe fiecare idee: mai ușor, mai greu, altă variantă, fără materiale, mai multă mișcare, mai liniștit.
+  - Tab nou „Poveste”: poveste de seară cu Pufi și prietenii, pe o temă aleasă, citită cu voce de telefon.
+  - Plan pe săptămână cu AI dintr-o atingere și istoric cu ideile create.
+  - Dictare: spui ce vrei, în loc să scrii.
+
 ## 0.3.1 (22.11.2026)
 
 - Scrie pe nisip: copilul alege ce scrie, linii, litere sau cifre (0–9, cu ordinea corectă a liniilor).

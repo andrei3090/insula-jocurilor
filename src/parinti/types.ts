@@ -27,7 +27,7 @@ export const ENERGY = { calm: 'Liniștit', activ: 'Cu mișcare' } as const;
 export type Energy = keyof typeof ENERGY;
 
 export const THEMES = {
-  pufi: 'Pufi, ursulețul panda',
+  pufi: 'Pufi, micuța panda (fetiță)',
   bruno: 'Bruno, ursulețul explorator',
   cenusareasa: 'Cenușăreasa',
   marina: 'Marina, mica navigatoare',

@@ -20,6 +20,7 @@ export async function generateJson(opts: {
   model: string;
   prompt: string;
   jpegBase64?: string;
+  schema?: Record<string, unknown>;
 }): Promise<string> {
   if (!opts.apiKey) throw new GeminiError('Lipsește cheia Gemini. O pui în Setări.');
   const { GoogleGenAI } = await import('@google/genai');
@@ -33,8 +34,10 @@ export async function generateJson(opts: {
       response_format: {
         type: 'text',
         mime_type: 'application/json',
-        schema: ACTIVITY_SCHEMA as unknown as Record<string, unknown>,
+        schema: opts.schema ?? (ACTIVITY_SCHEMA as unknown as Record<string, unknown>),
       },
+      // 'low' thinking: ~29 s instead of ~72 s for 3 ideas (measured 22.11.2026), same quality
+      generation_config: { thinking_level: 'low' },
     } as never);
     const text = (it as { output_text?: string }).output_text;
     if (!text) throw new GeminiError('Răspuns gol. Mai încearcă o dată.');

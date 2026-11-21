@@ -68,3 +68,88 @@ test('the child app never calls the network for AI', async ({ page }) => {
   await page.waitForTimeout(1500);
   expect(calls).toEqual([]);
 });
+
+const act = (title: string) => ({
+  title,
+  minutes: 10,
+  energy: 'calm',
+  skills: ['numere'],
+  materials: ['nimic'],
+  play: ['Pasul 1.', 'Pasul 2.'],
+  goal: 'Numărat.',
+  safety: 'Un adult e lângă copil.',
+});
+
+async function mockGemini(page: import('@playwright/test').Page, bodies: string[]) {
+  await page.route('**/interactions**', async (route) => {
+    const body = route.request().postData() ?? '';
+    bodies.push(body);
+    let answer: unknown;
+    if (body.includes('poveste de seară'))
+      answer = {
+        title: 'Pufi și luna',
+        paragraphs: ['A fost odată Pufi.', 'Pufi a văzut luna.', 'Noapte bună!'],
+        questions: ['Ce a văzut Pufi?'],
+      };
+    else if (body.includes('exact 7 activități'))
+      answer = {
+        activities: ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'].map((d) =>
+          act(`Joc de ${d}`),
+        ),
+      };
+    else if (body.includes('Rescrie-o')) answer = { activities: [act('Varianta fără materiale')] };
+    else answer = { activities: [act('Idee AI')] };
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        id: 't',
+        status: 'completed',
+        steps: [{ type: 'model_output', content: [{ type: 'text', text: JSON.stringify(answer) }] }],
+      }),
+    });
+  });
+}
+
+async function setKey(page: import('@playwright/test').Page) {
+  await page.getByTestId('nav-setari').click();
+  await page.getByTestId('key-input').fill('test-key-not-real');
+  await page.getByRole('button', { name: 'Salvează' }).click();
+}
+
+test('parent app: profile goes into the request; bedtime story is written and shown', async ({ page }) => {
+  const bodies: string[] = [];
+  await mockGemini(page, bodies);
+  await page.goto('./parinti/');
+  await setKey(page);
+  await page.getByTestId('profile').getByPlaceholder('Poreclă (opțional)').fill('Rița');
+  await page.getByTestId('nav-poveste').click();
+  await page.getByTestId('make-story').click();
+  await expect(page.getByTestId('story')).toContainText('Pufi și luna');
+  await expect(page.getByTestId('story')).toContainText('Ce a văzut Pufi?');
+  expect(bodies.at(-1)).toContain('Rița');
+  expect(bodies.at(-1)).toContain('thinking_level');
+});
+
+test('parent app: AI week plan fills all 7 days; history keeps AI ideas', async ({ page }) => {
+  await mockGemini(page, []);
+  await page.goto('./parinti/');
+  await setKey(page);
+  await page.getByTestId('nav-plan').click();
+  await page.getByTestId('week-ai').click();
+  for (const d of ['Luni', 'Duminică']) await expect(page.getByText(`Joc de ${d}`).first()).toBeVisible();
+  await page.getByTestId('nav-creeaza').click();
+  await page.getByTestId('generate').click();
+  await expect(page.getByText('Idee AI')).toBeVisible();
+  await page.getByTestId('nav-plan').click();
+  await expect(page.getByText(/Istoric idei AI \(\d+\)/)).toBeVisible();
+});
+
+test('parent app: refine an idea ("Fără materiale") replaces it in place', async ({ page }) => {
+  await mockGemini(page, []);
+  await page.goto('./parinti/');
+  await setKey(page);
+  await page.getByTestId('nav-idei').click();
+  await page.getByTestId('activity').first().click();
+  await page.getByTestId('refine-fara').click();
+  await expect(page.getByTestId('detail')).toContainText('Varianta fără materiale');
+});
