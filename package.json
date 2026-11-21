@@ -1,7 +1,7 @@
 {
   "name": "insula-jocurilor",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Jocuri educative pentru copii de 4-10 ani, pentru tabletă cu creion.",
   "scripts": {

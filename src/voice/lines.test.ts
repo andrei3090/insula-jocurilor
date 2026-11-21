@@ -5,8 +5,11 @@ import { describe, expect, it } from 'vitest';
 import { lines } from './lines';
 import { clipKey, speakerFor } from './speakers';
 
-const hash = (id: string, text: string) =>
-  createHash('sha1').update(clipKey(id, text)).digest('hex').slice(0, 12);
+const hash = (id: string, text: string, e: 'ioana' | 'gemini') =>
+  createHash('sha1')
+    .update(clipKey(id, text, e))
+    .digest('hex')
+    .slice(0, 12);
 const manifest: Record<string, string> = JSON.parse(readFileSync('public/audio/manifest.json', 'utf8'));
 
 function walk(dir: string): string[] {
@@ -28,9 +31,13 @@ describe('character voices', () => {
 });
 
 describe('voice clips', () => {
-  it('every LineId has a clip with a matching text hash (run `npm run voice`)', () => {
+  it('every LineId has a clip (Gemini, or the Ioana placeholder) matching its current text', () => {
     const stale = Object.entries(lines)
-      .filter(([id, text]) => manifest[id] !== hash(id, text) || !existsSync(`public/audio/${id}.m4a`))
+      .filter(
+        ([id, text]) =>
+          ![hash(id, text, 'gemini'), hash(id, text, 'ioana')].includes(manifest[id]) ||
+          !existsSync(`public/audio/${id}.m4a`),
+      )
       .map(([id]) => id);
     expect(stale).toEqual([]);
   });

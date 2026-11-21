@@ -6,6 +6,9 @@ const SCORED = [
   { id: 'ursi', island: 'pestera' },
   { id: 'memorie', island: 'castel' },
   { id: 'nisip', island: 'laguna' },
+  { id: 'puncte', island: 'bambus' },
+  { id: 'abc', island: 'laguna' },
+  { id: 'cifre', island: 'bambus' },
 ];
 
 for (const g of SCORED) {

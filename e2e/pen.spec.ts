@@ -52,3 +52,41 @@ test('sand writing accepts an S Pen stroke traced along the groove', async ({ pa
   });
   await expect(page.getByTestId('bead-done')).toHaveCount(1, { timeout: 8000 });
 });
+
+test('connect-the-dots: an S Pen stroke through the dots in order completes the picture', async ({
+  page,
+}) => {
+  await start(page);
+  await openGame(page, 'bambus', 'puncte');
+  await page.evaluate(async () => {
+    const svg = document.querySelector('[data-testid=dots-board]')!;
+    const r = svg.getBoundingClientRect();
+    const cs = [...svg.querySelectorAll('circle')].map((c) => [
+      r.left + Number(c.getAttribute('cx')),
+      r.top + Number(c.getAttribute('cy')),
+    ]);
+    const P = (t: string, x: number, y: number, b = 1) =>
+      svg.dispatchEvent(
+        new PointerEvent(t, {
+          bubbles: true,
+          cancelable: true,
+          pointerId: 12,
+          pointerType: 'pen',
+          pressure: 0.6,
+          buttons: b,
+          clientX: x,
+          clientY: y,
+        }),
+      );
+    P('pointerdown', cs[0][0], cs[0][1]);
+    for (let i = 1; i < cs.length; i++)
+      for (let k = 1; k <= 10; k++)
+        P(
+          'pointermove',
+          cs[i - 1][0] + ((cs[i][0] - cs[i - 1][0]) * k) / 10,
+          cs[i - 1][1] + ((cs[i][1] - cs[i - 1][1]) * k) / 10,
+        );
+    P('pointerup', cs[cs.length - 1][0], cs[cs.length - 1][1], 0);
+  });
+  await expect(page.getByTestId('bead-done')).toHaveCount(1, { timeout: 10000 });
+});

@@ -43,10 +43,62 @@ export function cutPoints(sil, total, n) {
     .map((s) => (s.start + s.end) / 2);
 }
 
-/** Writes n clips; filter = extra ffmpeg audio filter for each clip. Returns false if it cannot split cleanly. */
-export function splitInto(file, outs, filter) {
+/**
+ * Cut points aligned with the expected line lengths: boundary k should fall near total * (weights up to k) / (all
+ * weights) (weights = syllables). Dynamic programming over the silences, in order, minimising the distance to the
+ * expected boundary and preferring longer silences. Robust to a long pause inside one line.
+ */
+export function alignedCutPoints(sil, total, weights) {
+  const n = weights.length;
+  const cands = sil
+    .filter((s) => s.start > 0.15 && s.end < total - 0.15 && s.dur >= 0.18)
+    .map((s) => ({ c: (s.start + s.end) / 2, d: s.dur }));
+  const m = cands.length;
+  if (m < n - 1) return null;
+  const sum = weights.reduce((a, b) => a + b, 0);
+  const expected = [];
+  let acc = 0;
+  for (let k = 0; k < n - 1; k++) {
+    acc += weights[k];
+    expected.push((total * acc) / sum);
+  }
+  const cost = (k, j) => (Math.abs(cands[j].c - expected[k]) / total) * 12 - Math.min(cands[j].d, 1.5);
+  // dp[k][j]: best cost with boundary k at candidate j
+  let prev = cands.map((_, j) => cost(0, j));
+  const from = [prev.map(() => -1)];
+  for (let k = 1; k < n - 1; k++) {
+    const cur = Array(m).fill(Number.POSITIVE_INFINITY);
+    const back = Array(m).fill(-1);
+    let best = Number.POSITIVE_INFINITY;
+    let bestJ = -1;
+    for (let j = 1; j < m; j++) {
+      if (prev[j - 1] < best) {
+        best = prev[j - 1];
+        bestJ = j - 1;
+      }
+      if (bestJ >= 0) {
+        cur[j] = best + cost(k, j);
+        back[j] = bestJ;
+      }
+    }
+    from.push(back);
+    prev = cur;
+  }
+  let j = prev.indexOf(Math.min(...prev));
+  if (!Number.isFinite(prev[j])) return null;
+  const picks = [];
+  for (let k = n - 2; k >= 0; k--) {
+    picks.unshift(cands[j].c);
+    j = from[k][j];
+  }
+  return picks;
+}
+
+/** Writes n clips; filter = extra ffmpeg audio filter for each clip; weights (syllables) enable aligned cutting. */
+export function splitInto(file, outs, filter, weights) {
   const total = duration(file);
-  const cuts = cutPoints(silences(file), total, outs.length);
+  const sil = silences(file);
+  const cuts = weights ? alignedCutPoints(sil, total, weights) : cutPoints(sil, total, outs.length);
   if (!cuts) return false;
   const bounds = [0, ...cuts, total];
   outs.forEach((out, i) => {

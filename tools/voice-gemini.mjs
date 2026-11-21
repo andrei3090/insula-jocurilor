@@ -114,7 +114,20 @@ if (mode === 'batch') {
       const tmp = join(tmpdir(), `insula-batch-${process.pid}.wav`);
       writeFileSync(tmp, wav);
       const outs = chunk.map(([id]) => join(stageDir, `${id}.m4a`));
-      if (splitInto(tmp, outs, LOUD)) {
+      // keep the raw take: it can be re-cut later without a new request
+      mkdirSync(join(stageDir, 'raw'), { recursive: true });
+      const rawName = `${who}-${counting === 'true' ? 'n' : 's'}-${Date.now()}`;
+      writeFileSync(join(stageDir, 'raw', `${rawName}.wav`), wav);
+      writeFileSync(join(stageDir, 'raw', `${rawName}.json`), JSON.stringify(chunk));
+      const syl = (t) => (t.match(/[aeiouăâîAEIOUĂÂÎ]/g) ?? []).length || 1;
+      if (
+        splitInto(
+          tmp,
+          outs,
+          LOUD,
+          chunk.map(([, t]) => syl(t)),
+        )
+      ) {
         for (const [id, t] of chunk) done[id] = hash(clipKey(id, t, 'gemini'));
         writeFileSync(stageManifest, `${JSON.stringify(done, null, 2)}\n`);
         console.log(`ok: ${who} ${chunk.length} lines`);
@@ -128,6 +141,53 @@ if (mode === 'batch') {
   const missing = Object.keys(lines).filter((id) => !done[id]).length;
   console.log(
     `batch: ${requests} request(s); ${Object.keys(lines).length - missing}/${Object.keys(lines).length} lines ready`,
+  );
+  process.exit(0);
+}
+
+if (mode === 'install-verified') {
+  // install only staged clips that passed the content check (.voice-gemini/verified.json from
+  // tools/voice-verify.test.ts) and the duration check; the others keep their current clip
+  const done = readJson(stageManifest);
+  const scores = readJson(join(stageDir, 'verified.json'));
+  const outDir = new URL('../public/audio/', import.meta.url).pathname;
+  const manifest = readJson(join(outDir, 'manifest.json'));
+  const syllables = (t) => (t.match(/[aeiouăâîAEIOUĂÂÎ]/g) ?? []).length || 1;
+  let ok = 0;
+  const skipped = [];
+  for (const [id, text] of Object.entries(lines)) {
+    const f = join(stageDir, `${id}.m4a`);
+    if (done[id] !== hash(clipKey(id, text, 'gemini')) || !existsSync(f)) continue;
+    let d = 0;
+    try {
+      d = Number(
+        execFileSync('ffprobe', [
+          '-v',
+          'error',
+          '-show_entries',
+          'format=duration',
+          '-of',
+          'csv=p=0',
+          f,
+        ]).toString(),
+      );
+    } catch {}
+    const syl = syllables(text);
+    const durationOk = d >= syl / 8.5 && d <= syl / 2.2 + 0.9;
+    // numbers come back as digits and letter names vary in transcripts: for those the duration decides
+    const formatOnly = /^(num\.|si$|letter\.)/.test(id);
+    const contentOk = (scores[id] ?? 0) >= 0.7 || formatOnly;
+    if (!durationOk || !contentOk) {
+      skipped.push(id);
+      continue;
+    }
+    writeFileSync(join(outDir, `${id}.m4a`), readFileSync(f));
+    manifest[id] = done[id];
+    ok++;
+  }
+  writeFileSync(join(outDir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+  console.log(
+    `installed ${ok} Gemini clip(s); kept the current clip for ${skipped.length}: ${skipped.join(', ')}`,
   );
   process.exit(0);
 }
@@ -196,7 +256,7 @@ if (mode === 'samples') {
     }
   }
   console.log(`samples in ${dir}`);
-} else {
+} else if (mode === 'all') {
   const outDir = new URL('../public/audio/', import.meta.url).pathname;
   const manifestPath = join(outDir, 'manifest.json');
   const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {};
@@ -216,4 +276,9 @@ if (mode === 'samples') {
     process.stdout.write(`\r${made} clips`);
   }
   console.log(`\nvoice (gemini): ${made} new clip(s)`);
+} else {
+  console.log(
+    `unknown mode "${mode}". Use: samples | batch [regex] | install-verified | install | all [regex]`,
+  );
+  process.exit(1);
 }

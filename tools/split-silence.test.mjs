@@ -3,7 +3,7 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { cutPoints, duration, splitInto } from './split-silence.mjs';
+import { alignedCutPoints, cutPoints, duration, splitInto } from './split-silence.mjs';
 
 const hasFfmpeg = spawnSync('ffmpeg', ['-version']).status === 0;
 
@@ -17,6 +17,18 @@ describe('split on silence', () => {
     ];
     expect(cutPoints(sil, 9, 3)).toEqual([2.6, 6.55]);
     expect(cutPoints(sil, 9, 6)).toBeNull();
+  });
+
+  it('alignedCutPoints ignores a long pause INSIDE a line and follows the expected lengths', () => {
+    // 3 lines with weights 2, 6, 2 over 10 s: boundaries expected at ~2 s and ~8 s.
+    // A long pause inside line 2 (at 5 s) must not be chosen.
+    const sil = [
+      { start: 1.8, end: 2.3, dur: 0.5 },
+      { start: 4.6, end: 5.8, dur: 1.2 },
+      { start: 7.8, end: 8.3, dur: 0.5 },
+    ];
+    expect(alignedCutPoints(sil, 10, [2, 6, 2])).toEqual([2.05, 8.05]);
+    expect(cutPoints(sil, 10, 3)?.some((c) => Math.abs(c - 5.2) < 1e-9)).toBe(true); // the old method cut inside line 2
   });
 
   it.runIf(hasFfmpeg)(

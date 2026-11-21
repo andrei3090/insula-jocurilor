@@ -34,8 +34,13 @@ const tmp = join(tmpdir(), `insula-voice-${process.pid}.aiff`);
 const only = process.argv[2] ? new RegExp(process.argv[2]) : null;
 
 for (const [id, text] of Object.entries(lines)) {
-  const h = hash(clipKey(id, text));
+  const h = hash(clipKey(id, text, 'ioana'));
   const file = join(outDir, `${id}.m4a`);
+  // never overwrite a clip that already has its natural Gemini voice
+  if (manifest[id] === hash(clipKey(id, text, 'gemini')) && existsSync(file)) {
+    next[id] = manifest[id];
+    continue;
+  }
   next[id] = h;
   if (manifest[id] === h && existsSync(file)) continue;
   if (only && !only.test(id)) {

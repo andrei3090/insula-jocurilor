@@ -1,5 +1,12 @@
 # Ce e nou
 
+## 0.3.0 (22.11.2026)
+
+- Voci noi, naturale, pentru fiecare personaj (Pufi, Bruno, Cenușăreasa, Marina, Tavi).
+- Joc nou: Unește punctele (cu creionul, de la 1 la 15; la final apare desenul).
+- Joc nou: Alfabetul animat (literele românești cu un cuvânt și o poză, prinde litera în baloane, „Ce începe cu…?”).
+- Joc nou: Cifrele vii (atingi cifra și apar atâtea animăluțe, numărate cu voce tare).
+
 ## 0.2.0 (21.11.2026)
 
 - Aplicația „Insula · Părinți” (/parinti/): 30 de idei de joacă acasă și afară, filtre după loc, timp și ce exersăm, idei noi create cu Gemini (cu cheia ta, doar pe telefonul tău), jocuri din poza cu obiectele din jur, plan pe săptămână.

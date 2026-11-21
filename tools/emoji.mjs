@@ -15,9 +15,8 @@ grapes cherries tangerine pear lemon peach pineapple birthday-cake cookie lollip
 wrapped-gift spiral-shell sailboat canoe desert-island gem-stone palm-tree water-wave sun cloud crescent-moon
 high-heeled-shoe ballet-shoes bowl-with-spoon chair bed teddy-bear honey-pot carrot castle magic-wand crystal-ball
 red-heart pink-heart artist-palette paintbrush crayon kite umbrella rocket anchor compass alarm-clock mantelpiece-clock
-coin money-bag ring bell drum seedling herb deciduous-tree evergreen-tree snowflake fire droplet house`.split(
-    /\s+/,
-  );
+coin money-bag ring bell drum seedling herb deciduous-tree evergreen-tree snowflake fire droplet house
+bread horse-face hippopotamus egg snake kiwi-fruit yo-yo zebra chicken`.split(/\s+/);
 
 const out = {};
 const missing = [];
