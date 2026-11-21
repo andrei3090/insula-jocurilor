@@ -1,6 +1,7 @@
 # Ce e nou
 
 ## 0.2.0 (21.11.2026)
+
 - Aplicația „Insula · Părinți” (/parinti/): 30 de idei de joacă acasă și afară, filtre după loc, timp și ce exersăm, idei noi create cu Gemini (cu cheia ta, doar pe telefonul tău), jocuri din poza cu obiectele din jur, plan pe săptămână.
 
 ## 0.1.0 (21.11.2026)
