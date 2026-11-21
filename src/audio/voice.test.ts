@@ -90,3 +90,24 @@ describe('voice never blocks a game', () => {
     await expect(playBuffer({ duration: 3 })).resolves.toBeUndefined();
   });
 });
+
+describe('silence is respected (B16)', () => {
+  it('with insula.mute=1 the voice never plays and web speech is never called', async () => {
+    localStorage.setItem('insula.mute', '1');
+    const { say, speakText } = await import('./voice');
+    const synth = {
+      getVoices: () => [{ lang: 'ro-RO', name: 'ro', localService: true }] as SpeechSynthesisVoice[],
+      speak: vi.fn(),
+      cancel: vi.fn(),
+    };
+    await speakText('Bună', synth);
+    await say({ text: 'Bună' });
+    expect(synth.speak).not.toHaveBeenCalled();
+    localStorage.removeItem('insula.mute');
+  });
+
+  it('the app no longer overrides the device silent switch (no audioSession "playback")', async () => {
+    const { readFileSync } = await import('node:fs');
+    expect(readFileSync('src/audio/engine.ts', 'utf8')).not.toMatch(/audioSession\.type\s*=/);
+  });
+});

@@ -1,6 +1,6 @@
 import type { Speakable } from '../core/types';
 import { type LineId, lines } from '../voice/lines';
-import { audio } from './engine';
+import { audio, isMuted } from './engine';
 
 const BASE = import.meta.env.BASE_URL;
 const buffers = new Map<string, Promise<AudioBuffer | null>>();
@@ -73,7 +73,7 @@ export function speakText(
   text: string,
   synth: SynthLike | undefined = globalThis.speechSynthesis,
 ): Promise<void> {
-  if (!synth || typeof SpeechSynthesisUtterance === 'undefined') return Promise.resolve();
+  if (!synth || typeof SpeechSynthesisUtterance === 'undefined' || isMuted()) return Promise.resolve();
   const voice = pickRoVoice(synth.getVoices());
   if (!voice) return Promise.resolve();
   return new Promise<void>((resolve) => {
@@ -108,7 +108,7 @@ export function stop() {
 }
 
 export async function say(x: Speakable): Promise<void> {
-  if (!enabled) return;
+  if (!enabled || isMuted()) return;
   stop();
   const t = token;
   if (typeof x === 'object' && 'text' in x) return speakText(x.text);

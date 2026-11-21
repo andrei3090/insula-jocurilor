@@ -1,5 +1,9 @@
 # Ce e nou
 
+## 0.4.1 (22.11.2026)
+
+- Sunetul respectă mereu modul silențios al telefonului sau tabletei.
+
 ## 0.4.0 (22.11.2026)
 
 - Insula · Părinți, cu AI mai bun:
