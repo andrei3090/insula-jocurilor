@@ -43,7 +43,7 @@ export function Tavi({ size, mood = 'idle', className, title = 'Tavi, uriașul m
         <ellipse cx={100} cy={148} rx={62} ry={46} fill="none" {...line} />
         {/* arms */}
         <ellipse cx={42} cy={142} rx={17} ry={28} fill={SKIN} transform="rotate(20 42 142)" {...line} />
-        <Arm mood={mood} ox={150} oy={120}>
+        <Arm mood={mood}>
           <ellipse cx={156} cy={136} rx={17} ry={28} fill={SKIN} transform="rotate(-25 156 136)" {...line} />
           <circle cx={162} cy={156} r={12} fill={SKIN} {...line} />
         </Arm>
@@ -65,7 +65,7 @@ export function Tavi({ size, mood = 'idle', className, title = 'Tavi, uriașul m
           strokeLinecap="round"
         />
         {/* happy eyes, bushy brows */}
-        <Blink cx={100} cy={62}>
+        <Blink>
           <path d="M78 64 Q85 56 92 64" fill="none" {...line} />
           <path d="M108 64 Q115 56 122 64" fill="none" {...line} />
         </Blink>

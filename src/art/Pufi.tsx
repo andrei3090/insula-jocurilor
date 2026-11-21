@@ -17,7 +17,7 @@ export function Pufi({ size, mood = 'idle', className, title = 'Pufi, ursulețul
         {/* left arm */}
         <ellipse cx={55} cy={150} rx={14} ry={25} fill={DARK} transform="rotate(18 55 150)" {...line} />
         {/* right arm (waves) */}
-        <Arm mood={mood} ox={140} oy={130}>
+        <Arm mood={mood}>
           <ellipse cx={145} cy={150} rx={14} ry={25} fill={DARK} transform="rotate(-18 145 150)" {...line} />
         </Arm>
         {/* ears */}
@@ -28,7 +28,7 @@ export function Pufi({ size, mood = 'idle', className, title = 'Pufi, ursulețul
         {/* eye patches */}
         <ellipse cx={77} cy={88} rx={15} ry={19} fill={DARK} transform="rotate(28 77 88)" />
         <ellipse cx={123} cy={88} rx={15} ry={19} fill={DARK} transform="rotate(-28 123 88)" />
-        <Blink cx={100} cy={86}>
+        <Blink>
           <circle cx={79} cy={86} r={9} fill={WHITE} />
           <circle cx={121} cy={86} r={9} fill={WHITE} />
           <Eye x={80} y={87} r={6} />

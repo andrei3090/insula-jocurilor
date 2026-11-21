@@ -10,12 +10,13 @@ export type Mood = 'idle' | 'happy' | 'think' | 'wave';
 export type CharacterProps = { size?: number; mood?: Mood; className?: string; title?: string };
 
 /** Eyes that blink every few seconds (off with reduced motion). */
-export function Blink({ children, cx, cy }: { children: ReactNode; cx: number; cy: number }) {
+export function Blink({ children }: { children: ReactNode }) {
   const reduce = useReducedMotion();
   const delay = useMemo(() => 1 + Math.random() * 3, []);
   return (
     <motion.g
-      style={{ originX: `${cx}px`, originY: `${cy}px` }}
+      data-part="eyes"
+      style={{ originX: 0.5, originY: 0.5 }}
       animate={reduce ? undefined : { scaleY: [1, 1, 0.08, 1] }}
       transition={{ duration: 4.5, times: [0, 0.9, 0.95, 1], repeat: Number.POSITIVE_INFINITY, delay }}
     >
@@ -49,7 +50,7 @@ export function Body({ mood, children }: { mood: Mood; children: ReactNode }) {
         : { rotate: 6, y: 0 };
   return (
     <motion.g
-      style={{ originX: '100px', originY: '190px' }}
+      style={{ originX: 0.5, originY: 1 }}
       animate={anim}
       transition={mood === 'happy' ? { duration: 0.9, ease: 'easeOut' } : { type: 'spring', stiffness: 120 }}
     >
@@ -58,12 +59,25 @@ export function Body({ mood, children }: { mood: Mood; children: ReactNode }) {
   );
 }
 
-/** An arm that waves from its shoulder when mood = wave. */
-export function Arm({ mood, ox, oy, children }: { mood: Mood; ox: number; oy: number; children: ReactNode }) {
+/**
+ * An arm that waves from its shoulder when mood = wave.
+ * `origin` is the shoulder as a fraction of the arm's own box (motion pivots SVG on fill-box).
+ */
+export function Arm({
+  mood,
+  origin = [0.25, 0.08],
+  children,
+}: {
+  mood: Mood;
+  origin?: [number, number];
+  children: ReactNode;
+}) {
   const reduce = useReducedMotion();
   return (
     <motion.g
-      style={{ originX: `${ox}px`, originY: `${oy}px` }}
+      data-part="arm"
+      data-origin={origin.join(',')}
+      style={{ originX: origin[0], originY: origin[1] }}
       animate={mood === 'wave' && !reduce ? { rotate: [0, -35, -10, -35, 0] } : { rotate: 0 }}
       transition={{ duration: 1.4, ease: 'easeInOut' }}
     >

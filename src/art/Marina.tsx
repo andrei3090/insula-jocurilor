@@ -45,7 +45,7 @@ export function Marina({
         <path d="M76 110 Q62 126 64 142" stroke={SKIN} strokeWidth={12} strokeLinecap="round" fill="none" />
         <circle cx={62} cy={150} r={13} fill="#ffe08a" {...thin} />
         <path d={star(62, 150, 8)} fill="#ff9f43" />
-        <Arm mood={mood} ox={124} oy={110}>
+        <Arm mood={mood}>
           <path
             d="M124 110 Q138 126 136 142"
             stroke={SKIN}
@@ -79,7 +79,7 @@ export function Marina({
           ))}
           <circle r={7} fill="#ffd166" {...thin} strokeWidth={2.5} />
         </g>
-        <Blink cx={100} cy={72}>
+        <Blink>
           <Eye x={87} y={72} r={6.5} iris="#3a2418" />
           <Eye x={113} y={72} r={6.5} iris="#3a2418" />
         </Blink>

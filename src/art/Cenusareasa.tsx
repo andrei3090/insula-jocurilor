@@ -61,7 +61,7 @@ export function Cenusareasa({ size, mood = 'idle', className, title = 'Cenușăr
         {/* arms */}
         <path d="M66 116 Q58 132 62 144" stroke={SKIN} strokeWidth={11} strokeLinecap="round" fill="none" />
         <circle cx={62} cy={146} r={7} fill={SKIN} {...thin} />
-        <Arm mood={mood} ox={132} oy={110}>
+        <Arm mood={mood}>
           <path
             d="M134 116 Q142 132 138 144"
             stroke={SKIN}
@@ -96,7 +96,7 @@ export function Cenusareasa({ size, mood = 'idle', className, title = 'Cenușăr
           fill={HAIR}
           {...thin}
         />
-        <Blink cx={100} cy={64}>
+        <Blink>
           <Eye x={87} y={64} r={6.5} iris="#6b3f2a" />
           <Eye x={113} y={64} r={6.5} iris="#6b3f2a" />
         </Blink>

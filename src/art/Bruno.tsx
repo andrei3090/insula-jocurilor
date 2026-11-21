@@ -33,7 +33,7 @@ export function Bruno({
           <path d="M-10 12 H10 M-10 22 H10" {...thin} strokeWidth={2} />
           <circle cx={0} cy={17} r={4} fill="#ff9f43" />
         </g>
-        <Arm mood={mood} ox={140} oy={130}>
+        <Arm mood={mood}>
           <ellipse cx={144} cy={150} rx={14} ry={24} fill={FUR} transform="rotate(-16 144 150)" {...line} />
         </Arm>
         {/* ears */}
@@ -44,7 +44,7 @@ export function Bruno({
         {/* head */}
         <circle cx={100} cy={86} r={52} fill={FUR} {...line} />
         <ellipse cx={100} cy={106} rx={26} ry={19} fill={MUZZLE} {...thin} />
-        <Blink cx={100} cy={82}>
+        <Blink>
           <Eye x={79} y={82} r={7.5} />
           <Eye x={121} y={82} r={7.5} />
         </Blink>
