@@ -15,6 +15,21 @@ test('parent app: library filters, detail, save to plan', async ({ page }) => {
   await expect(page.getByText('Salvate (1)')).toBeVisible();
 });
 
+test('parent app: home shortcuts, idea of the day and the surprise idea', async ({ page }) => {
+  await page.goto('./parinti/');
+  await page.getByTestId('idea-of-day').click();
+  await expect(page.getByTestId('detail')).toBeVisible();
+  await page.getByLabel('Închide').click();
+  await expect(page.getByTestId('detail')).toHaveCount(0);
+  await page.getByTestId('quick-surpriza').click();
+  await expect(page.getByTestId('detail')).toBeVisible();
+  await page.getByLabel('Închide').click();
+  await page.getByTestId('quick-poveste').click();
+  await expect(page.getByTestId('make-story')).toBeVisible();
+  await page.getByText('Mergi la Setări').click();
+  await expect(page.getByTestId('key-input')).toBeVisible();
+});
+
 test('parent app: AI ideas (Gemini answer simulated, nothing leaves the test)', async ({ page }) => {
   let body = '';
   await page.route('**/interactions**', async (route) => {

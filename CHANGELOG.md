@@ -1,5 +1,15 @@
 # Ce e nou
 
+## 0.5.1 (22.11.2026)
+
+- Insula · Părinți are un aspect nou, mai viu:
+  - Antet ilustrat cu Pufi pe insulă și un salut după ora din zi (dimineață, zi, seară, noapte cu stele).
+  - Scurtături mari și colorate: Creează cu AI, Din poză, Poveste de seară, Surpriză.
+  - „Ideea zilei” și carduri cu imagini colorate pentru fiecare idee.
+  - Fișa unei idei: listă de materiale cu bife, pași numerotați, butoane Salvează și Pune în plan mereu la îndemână.
+  - Povestea de seară arată ca o pagină de carte; planul săptămânii are zilele colorate și ziua de azi marcată.
+  - Bara de jos plutitoare, cu iconițe colorate.
+
 ## 0.5.0 (22.11.2026)
 
 - Joc nou în Atelier: Desenăm cu Pufi. Copilul alege un desen (soarele, peștișorul, floarea, Pufi, ursulețul, țestoasa sau castelul Cenușăresei) și îl desenează pas cu pas cu creionul, pe linia punctată, în timp ce Pufi îi spune ce formă urmează (cerc, oval, triunghi, pătrat, linie).
