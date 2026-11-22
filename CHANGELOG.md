@@ -1,5 +1,9 @@
 # Ce e nou
 
+## 0.6.3 (22.11.2026)
+
+- Și mai multe voci naturale: titlurile jocurilor, instrucțiunile din Atelier, Colorează, Hrănește-l pe Pufi și Alfabet, o parte din „Desenăm cu Pufi” și aproape tot ce spun personajele când le atingi vorbesc acum cu vocea caldă a personajelor. Mai rămân câteva replici (Xilofonul, Unește punctele, Cifrele, o parte din Desenăm cu Pufi) pentru actualizarea următoare.
+
 ## 0.6.2 (22.11.2026)
 
 - Mai multe voci naturale: titlul jocului cu ursuleții, potrivirile lor, literele din Alfabet și încă câteva replici vorbesc acum cu vocea caldă a personajelor, nu cu vocea robotică. Restul replicilor vin în actualizarea următoare.

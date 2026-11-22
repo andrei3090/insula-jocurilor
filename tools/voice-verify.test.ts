@@ -1,7 +1,7 @@
 // @vitest-environment node
 // Verifies staged Gemini voice clips by CONTENT: Gemini transcribes each clip, we compare with the expected text.
 // On demand only:  INSULA_VOICE_VERIFY=1 npx vitest run tools/voice-verify.test.ts
-// (INSULA_VERIFY_MODEL=gemini-3.5-flash picks another transcribing model)
+// (INSULA_VERIFY_MODEL=gemini-3.1-flash-lite picks another transcribing model, INSULA_VERIFY_CHUNK=1 one clip per request)
 // Writes .voice-gemini/verified.json = { id: similarity 0..1 }.
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
@@ -35,7 +35,7 @@ function similarity(a: string, b: string): number {
 }
 
 describe.runIf(on)('staged Gemini clips say the right text', () => {
-  it('transcribes and scores every staged clip', { timeout: 900_000 }, async () => {
+  it('transcribes and scores every staged clip', { timeout: 3_600_000 }, async () => {
     const key = execFileSync('security', [
       'find-generic-password',
       '-a',
@@ -53,8 +53,10 @@ describe.runIf(on)('staged Gemini clips say the right text', () => {
       ? JSON.parse(readFileSync(`${dir}/verified.json`, 'utf8'))
       : {};
     const todo = ids.filter((id) => scores[id] === undefined);
-    for (let i = 0; i < todo.length; i += 20) {
-      const chunk = todo.slice(i, i + 20);
+    // clips per request: 1 is slower but never pairs a transcript with the wrong clip
+    const per = Number(process.env.INSULA_VERIFY_CHUNK ?? 20);
+    for (let i = 0; i < todo.length; i += per) {
+      const chunk = todo.slice(i, i + per);
       const content: Record<string, unknown>[] = [
         {
           type: 'text',
