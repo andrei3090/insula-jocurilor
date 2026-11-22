@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pufi } from '../../art/Pufi';
+import { LiveGuide } from '../../art/LiveGuide';
 import type { Mood } from '../../art/parts';
 import { sfx } from '../../audio/sfx';
 import { saveDrawing } from '../../core/drawings';
@@ -406,7 +406,7 @@ function Board({
             current={colouring ? undefined : stepIdx}
           />
         </div>
-        <Pufi size={portrait ? 120 : 170} mood={mood} />
+        <LiveGuide who="pufi" size={portrait ? 120 : 170} mood={mood} />
       </div>
 
       <motion.div

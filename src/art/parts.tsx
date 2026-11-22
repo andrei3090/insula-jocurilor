@@ -5,7 +5,7 @@ export const INK = '#3b2a4a';
 export const line = { stroke: INK, strokeWidth: 4, strokeLinejoin: 'round', strokeLinecap: 'round' } as const;
 export const thin = { stroke: INK, strokeWidth: 3, strokeLinejoin: 'round', strokeLinecap: 'round' } as const;
 
-export type Mood = 'idle' | 'happy' | 'think' | 'wave';
+export type Mood = 'idle' | 'happy' | 'think' | 'wave' | 'dance';
 
 export type CharacterProps = { size?: number; mood?: Mood; className?: string; title?: string };
 
@@ -49,7 +49,7 @@ export function Blush({ x, y, rx = 9, ry = 5.5 }: { x: number; y: number; rx?: n
   return <ellipse cx={x} cy={y} rx={rx} ry={ry} fill="#ff9fb0" opacity={0.65} />;
 }
 
-/** Whole-body motion for moods: a happy hop, a thinking tilt. */
+/** Whole-body motion for moods: a happy hop, a thinking tilt, a little dance (two wiggles with hops). */
 export function Body({ mood, children }: { mood: Mood; children: ReactNode }) {
   const reduce = useReducedMotion();
   const anim =
@@ -57,12 +57,22 @@ export function Body({ mood, children }: { mood: Mood; children: ReactNode }) {
       ? { y: 0, rotate: 0 }
       : mood === 'happy'
         ? { y: [0, -14, 0, -8, 0], rotate: 0 }
-        : { rotate: 6, y: 0 };
+        : mood === 'dance'
+          ? { y: [0, -10, 0, -10, 0, -10, 0, -10, 0], rotate: [0, -9, 0, 9, 0, -9, 0, 9, 0] }
+          : { rotate: 6, y: 0 };
   return (
     <motion.g
+      data-part="body"
+      data-mood={mood}
       style={{ originX: 0.5, originY: 1 }}
       animate={anim}
-      transition={mood === 'happy' ? { duration: 0.9, ease: 'easeOut' } : { type: 'spring', stiffness: 120 }}
+      transition={
+        mood === 'happy'
+          ? { duration: 0.9, ease: 'easeOut' }
+          : mood === 'dance'
+            ? { duration: 2.2, ease: 'easeInOut' }
+            : { type: 'spring', stiffness: 120 }
+      }
     >
       {children}
     </motion.g>
@@ -70,7 +80,7 @@ export function Body({ mood, children }: { mood: Mood; children: ReactNode }) {
 }
 
 /**
- * An arm that waves from its shoulder when mood = wave.
+ * An arm that waves from its shoulder when mood = wave (and swings during a dance).
  * `origin` is the shoulder as a fraction of the arm's own box (motion pivots SVG on fill-box).
  */
 export function Arm({
@@ -88,8 +98,16 @@ export function Arm({
       data-part="arm"
       data-origin={origin.join(',')}
       style={{ originX: origin[0], originY: origin[1] }}
-      animate={mood === 'wave' && !reduce ? { rotate: [0, -35, -10, -35, 0] } : { rotate: 0 }}
-      transition={{ duration: 1.4, ease: 'easeInOut' }}
+      animate={
+        reduce
+          ? { rotate: 0 }
+          : mood === 'wave'
+            ? { rotate: [0, -35, -10, -35, 0] }
+            : mood === 'dance'
+              ? { rotate: [0, -40, 0, -40, 0, -40, 0] }
+              : { rotate: 0 }
+      }
+      transition={{ duration: mood === 'dance' ? 2.2 : 1.4, ease: 'easeInOut' }}
     >
       {children}
     </motion.g>

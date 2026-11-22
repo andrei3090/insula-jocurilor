@@ -1,5 +1,11 @@
 # Ce e nou
 
+## 0.6.0 (22.11.2026)
+
+- Personajele prind viață: dacă le atingi, sar, fac cu mâna sau dansează, chicotesc fiecare cu vocea lui, iar pe insula lor spun și câte ceva („Hihi! Mă gâdili!”).
+- Pe fiecare insulă, ghidul stă acum pe insula lui desenată: Pufi printre bambuși, Bruno la peșteră, Cenușăreasa la castel, Marina și Tavi pe plajă.
+- La finalul fiecărei runde, Pufi și ghidul insulei dansează pe o melodie scurtă, lângă abțibildul nou.
+
 ## 0.5.1 (22.11.2026)
 
 - Insula · Părinți are un aspect nou, mai viu:

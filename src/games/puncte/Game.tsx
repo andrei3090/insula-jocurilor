@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Emoji } from '../../art/Emoji';
-import { Pufi } from '../../art/Pufi';
+import { LiveGuide } from '../../art/LiveGuide';
 import type { Mood } from '../../art/parts';
 import { sfx } from '../../audio/sfx';
 import { randomSeed, rng } from '../../core/rng';
@@ -155,7 +155,7 @@ export default function PuncteGame({ level, onItem, voice, hints, registerTest }
   return (
     <div ref={area} className="relative flex h-full items-center justify-center gap-4 px-4 pb-4">
       <div className="absolute bottom-2 left-3 portrait:hidden">
-        <Pufi size={170} mood={mood} />
+        <LiveGuide who="pufi" size={170} mood={mood} />
       </div>
       <div
         className="relative rounded-[2rem] border-4 border-ink/60 bg-white shadow-inner"

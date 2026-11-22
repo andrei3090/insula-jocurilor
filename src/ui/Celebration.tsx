@@ -2,7 +2,8 @@ import confetti from 'canvas-confetti';
 import { motion, useReducedMotion } from 'motion/react';
 import { useEffect, useMemo } from 'react';
 import { Emoji, type EmojiName } from '../art/Emoji';
-import { Pufi } from '../art/Pufi';
+import { LiveGuide } from '../art/LiveGuide';
+import type { Avatar } from '../core/profile';
 import { BigButton } from './BigButton';
 import { AgainIcon, HouseIcon } from './icons';
 
@@ -47,13 +48,15 @@ export function StarBurst({ x = '50%', y = '45%' }: { x?: string; y?: string }) 
   );
 }
 
-/** End of a round: confetti, the new sticker, "again" or "home". */
+/** End of a round: confetti, Pufi and the island's guide dance, the new sticker, "again" or "home". */
 export function RoundEnd({
   sticker,
+  guide,
   onAgain,
   onHome,
 }: {
   sticker: EmojiName | null;
+  guide?: Avatar;
   onAgain(): void;
   onHome(): void;
 }) {
@@ -94,7 +97,8 @@ export function RoundEnd({
         transition={{ type: 'spring', stiffness: 260, damping: 16 }}
       >
         <div className="flex items-end gap-6">
-          <Pufi size={150} mood="happy" />
+          <LiveGuide who="pufi" size={150} mood="dance" />
+          {guide && guide !== 'pufi' && <LiveGuide who={guide} size={150} mood="dance" />}
           {sticker && (
             <motion.div
               className="relative grid size-40 place-items-center rounded-full border-4 border-ink/80 bg-sun"

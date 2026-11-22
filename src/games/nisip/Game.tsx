@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Emoji } from '../../art/Emoji';
-import { Marina } from '../../art/Marina';
+import { LiveGuide } from '../../art/LiveGuide';
 import type { Mood } from '../../art/parts';
 import { sfx } from '../../audio/sfx';
 import { useProgress } from '../../core/progress';
@@ -241,7 +241,7 @@ function Board({
       style={{ background: 'radial-gradient(circle at 30% 20%, #fff2cf 0%, #ffe3a8 45%, #f3cf8b 100%)' }}
     >
       <div className="absolute bottom-2 left-4 portrait:hidden">
-        <Marina size={190} mood={mood} />
+        <LiveGuide who="marina" size={190} mood={mood} />
       </div>
       <button
         type="button"

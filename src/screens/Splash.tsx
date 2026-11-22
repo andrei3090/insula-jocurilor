@@ -1,7 +1,5 @@
 import { motion } from 'motion/react';
-import { Bruno } from '../art/Bruno';
-import { Marina } from '../art/Marina';
-import { Pufi } from '../art/Pufi';
+import { LiveGuide } from '../art/LiveGuide';
 import { unlockAudio } from '../audio/engine';
 import { sfx } from '../audio/sfx';
 import { voice } from '../audio/voice';
@@ -33,9 +31,9 @@ export function Splash() {
           Insula Jocurilor
         </motion.h1>
         <div className="flex items-end gap-2">
-          <Bruno size={150} mood="idle" />
-          <Pufi size={200} mood="wave" />
-          <Marina size={150} mood="idle" />
+          <LiveGuide who="bruno" size={150} />
+          <LiveGuide who="pufi" size={200} mood="wave" />
+          <LiveGuide who="marina" size={150} />
         </div>
         <div className="relative">
           {/* the halo pulses, the button stays still (a moving target is harder to tap) */}

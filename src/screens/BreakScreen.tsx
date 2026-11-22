@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { useEffect } from 'react';
-import { Pufi } from '../art/Pufi';
+import { LiveGuide } from '../art/LiveGuide';
 import { voice } from '../audio/voice';
 import { useSession } from '../core/session';
 import { LockButton } from '../ui/ParentGate';
@@ -18,7 +18,7 @@ export function BreakScreen({ onParentDismiss }: { onParentDismiss(): void }) {
       animate={{ opacity: 1 }}
     >
       <div className="flex flex-col items-center gap-4">
-        <Pufi size={260} mood="wave" />
+        <LiveGuide who="pufi" size={260} mood="wave" />
         <p className="text-4xl font-semibold">Pauză!</p>
         <p className="max-w-md text-center text-xl text-ink/70">
           Ne-am jucat frumos. Mișcă-te puțin și bea un pahar cu apă.

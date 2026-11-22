@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { Emoji } from '../../art/Emoji';
-import { Marina } from '../../art/Marina';
+import { LiveGuide } from '../../art/LiveGuide';
 import type { Mood } from '../../art/parts';
 import { sfx } from '../../audio/sfx';
 import { useProgress } from '../../core/progress';
@@ -110,7 +110,7 @@ export default function AbcGame({ level, onItem, voice, hints, registerTest, pro
   return (
     <div className="relative flex h-full items-center justify-center gap-10 px-6 pb-4 portrait:flex-col portrait:gap-6">
       <div className="absolute bottom-2 left-3 portrait:hidden">
-        <Marina size={160} mood={mood} />
+        <LiveGuide who="marina" size={160} mood={mood} />
       </div>
 
       {skill === 'abc.sound' ? (

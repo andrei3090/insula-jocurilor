@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
-import { Bruno } from '../../art/Bruno';
+import { LiveGuide } from '../../art/LiveGuide';
 import type { Mood } from '../../art/parts';
 import { playNote } from '../../audio/notes';
 import { sfx } from '../../audio/sfx';
@@ -148,7 +148,7 @@ export default function XilofonGame({ level, onItem, voice, hints, registerTest 
   return (
     <div ref={area} className="relative flex h-full flex-col items-center justify-center gap-4 px-6 pb-4">
       <div className="absolute bottom-2 left-3 portrait:hidden">
-        <Bruno size={150} mood={mood} />
+        <LiveGuide who="bruno" size={150} mood={mood} />
       </div>
       <div className="flex min-h-[40px] items-center gap-2" aria-hidden="true">
         {!song &&

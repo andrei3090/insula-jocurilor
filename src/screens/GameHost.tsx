@@ -97,7 +97,7 @@ export function GameHost({ manifest, onExit }: { manifest: GameManifest; onExit(
 
   const endRound = useCallback(() => {
     const sticker = scored ? (award(profile.id) as EmojiName | null) : null;
-    sfx.fanfare();
+    sfx.party();
     void voice.say(sticker ? 'round.done' : 'round.full');
     if (useSession.getState().isOver(limitMin)) setOnBreak(true);
     setEnded({ sticker });
@@ -195,7 +195,9 @@ export function GameHost({ manifest, onExit }: { manifest: GameManifest; onExit(
       </main>
       {burst > 0 && <StarBurst key={burst} />}
       <AnimatePresence>
-        {ended && !onBreak && <RoundEnd sticker={ended.sticker} onAgain={again} onHome={onExit} />}
+        {ended && !onBreak && (
+          <RoundEnd sticker={ended.sticker} guide={C.guide} onAgain={again} onHome={onExit} />
+        )}
       </AnimatePresence>
       {onBreak && (
         <BreakScreen

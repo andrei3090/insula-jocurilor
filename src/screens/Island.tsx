@@ -1,6 +1,8 @@
 import { motion } from 'motion/react';
 import { useEffect } from 'react';
-import { GUIDES, ISLANDS } from '../art/guides';
+import { ISLANDS } from '../art/guides';
+import { IslandArt } from '../art/islands';
+import { LiveGuide } from '../art/LiveGuide';
 import { sfx } from '../audio/sfx';
 import { voice } from '../audio/voice';
 import { useProfile } from '../core/profile';
@@ -11,12 +13,12 @@ import { BigButton } from '../ui/BigButton';
 import { HouseIcon } from '../ui/icons';
 import type { LineId } from '../voice/lines';
 
+const SCENE = 470;
+
 export function Island({ island }: { island: IslandId }) {
   const go = useRouter((s) => s.go);
   const age = useProfile((s) => s.active().age);
   const info = ISLANDS[island];
-  const Guide = GUIDES[info.guide];
-  const Friend = info.friend ? GUIDES[info.friend] : null;
   const list = gamesFor(island, age);
 
   useEffect(() => {
@@ -36,9 +38,19 @@ export function Island({ island }: { island: IslandId }) {
         <h1 className="text-4xl font-semibold">{info.name}</h1>
       </header>
       <div className="flex h-full items-center gap-6 px-8 pt-24 portrait:flex-col portrait:justify-center">
-        <div className="flex shrink-0 items-end portrait:order-2">
-          <Guide size={230} mood="wave" />
-          {Friend && <Friend size={170} mood="idle" />}
+        {/* the guides stand on their own island; a tap makes them hop, wave or dance and say hello */}
+        <div
+          className="relative shrink-0 portrait:order-2"
+          style={{ width: SCENE }}
+          data-testid="island-scene"
+        >
+          <div className="pointer-events-none absolute inset-x-0 bottom-0">
+            <IslandArt id={island} width={SCENE} />
+          </div>
+          <div className="relative flex items-end justify-center" style={{ paddingBottom: SCENE * 0.15 }}>
+            <LiveGuide who={info.guide} size={230} mood="wave" speak />
+            {info.friend && <LiveGuide who={info.friend} size={170} speak />}
+          </div>
         </div>
         <div className="flex flex-1 flex-wrap content-center justify-center gap-6">
           {list.map((g, i) => (

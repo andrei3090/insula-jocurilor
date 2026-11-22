@@ -258,6 +258,21 @@ export const lines = {
   'ghidat.castle.towers': 'Două turnuri, câte unul de fiecare parte.',
   'ghidat.castle.roofs': 'Două triunghiuri pentru acoperișuri.',
   'ghidat.castle.door': 'Și o ușă cu arcadă.',
+  'tap.pufi.1': 'Hihi! Mă gâdili!',
+  'tap.pufi.2': 'Bună! Ce bine că ești aici!',
+  'tap.pufi.3': 'Uite cum dansez!',
+  'tap.bruno.1': 'Mor-mor! Mă gâdili!',
+  'tap.bruno.2': 'Salut! Hai la o aventură!',
+  'tap.bruno.3': 'Uite dansul ursuleților!',
+  'tap.cenusareasa.1': 'Hihi! Ce surpriză!',
+  'tap.cenusareasa.2': 'Bună! Vii cu mine la bal?',
+  'tap.cenusareasa.3': 'Hai să dansăm ca la bal!',
+  'tap.marina.1': 'Hihi! Ce zi veselă!',
+  'tap.marina.2': 'Ahoi! Bine ai venit pe plajă!',
+  'tap.marina.3': 'Dansăm pe valuri!',
+  'tap.tavi.1': 'Ho-ho! Mă gâdili!',
+  'tap.tavi.2': 'Salut! Eu sunt Tavi, uriașul mării!',
+  'tap.tavi.3': 'Ho-ho! Și uriașii dansează!',
 } as const;
 
 export type LineId = keyof typeof lines;

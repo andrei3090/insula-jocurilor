@@ -16,10 +16,10 @@ export const SPEAKERS: Record<Speaker, { pitch: number; tempo: number }> = {
 };
 
 const RULES: [RegExp, Speaker][] = [
-  [/^(island\.pestera|game\.ursi|ursi\.|game\.xilofon|xilo\.)/, 'bruno'],
-  [/^(island\.castel|game\.memorie|memorie\.)/, 'cenusareasa'],
-  [/^(island\.laguna|game\.nisip|nisip\.|letter\.)/, 'marina'],
-  [/^(island\.atelier|game\.desen|desen\.|game\.coloreaza|coloreaza\.)/, 'tavi'],
+  [/^(island\.pestera|game\.ursi|ursi\.|game\.xilofon|xilo\.|tap\.bruno\.)/, 'bruno'],
+  [/^(island\.castel|game\.memorie|memorie\.|tap\.cenusareasa\.)/, 'cenusareasa'],
+  [/^(island\.laguna|game\.nisip|nisip\.|letter\.|tap\.marina\.)/, 'marina'],
+  [/^(island\.atelier|game\.desen|desen\.|game\.coloreaza|coloreaza\.|tap\.tavi\.)/, 'tavi'],
 ];
 
 export const speakerFor = (id: string): Speaker => RULES.find(([re]) => re.test(id))?.[1] ?? 'pufi';
