@@ -1,5 +1,9 @@
 # Ce e nou
 
+## 0.6.4 (22.11.2026)
+
+- Unește punctele, Alfabetul și alegerea din Scrie pe nisip vorbesc acum cu vocea naturală. Mai rămân Xilofonul, Cifrele și cea mai mare parte din Desenăm cu Pufi, pentru actualizarea următoare.
+
 ## 0.6.3 (22.11.2026)
 
 - Și mai multe voci naturale: titlurile jocurilor, instrucțiunile din Atelier, Colorează, Hrănește-l pe Pufi și Alfabet, o parte din „Desenăm cu Pufi” și aproape tot ce spun personajele când le atingi vorbesc acum cu vocea caldă a personajelor. Mai rămân câteva replici (Xilofonul, Unește punctele, Cifrele, o parte din Desenăm cu Pufi) pentru actualizarea următoare.
