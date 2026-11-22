@@ -418,7 +418,7 @@ function Detail({ a: initial, onClose }: { a: Activity; onClose(): void }) {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
-                className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none]"
+                className="-mx-4 mb-1 flex gap-2 overflow-x-auto px-4 pt-1 pb-2.5 [scrollbar-width:none]"
               >
                 {DAYS.map((d, i) => (
                   <Chip
@@ -1483,7 +1483,7 @@ function StoryTab() {
           {stories.length > 1 && (
             <>
               <SectionTitle icon="books">Poveștile de până acum</SectionTitle>
-              <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-2 [scrollbar-width:none]">
+              <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pt-1 pb-2.5 [scrollbar-width:none]">
                 {stories.map((st) => (
                   <Chip
                     key={st.id}

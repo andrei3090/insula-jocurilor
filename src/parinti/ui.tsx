@@ -41,7 +41,7 @@ export const Chip = ({
     whileTap={{ scale: 0.94 }}
     className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-4 text-[15px] font-medium whitespace-nowrap transition-colors ${
       on
-        ? 'bg-gradient-to-br from-[#8b6cf0] to-[#6a4bc9] text-white shadow-[0_4px_12px_-4px_rgba(106,75,201,0.7)]'
+        ? 'bg-gradient-to-br from-[#8b6cf0] to-[#6a4bc9] text-white shadow-[0_3px_8px_-3px_rgba(106,75,201,0.7)]'
         : 'bg-white text-ink shadow-[0_1px_2px_rgba(59,42,74,0.08)] ring-1 ring-ink/10'
     }`}
   >
@@ -50,10 +50,20 @@ export const Chip = ({
   </motion.button>
 );
 
+/** Fades a horizontal chip row out at both ends, so a cut chip reads as "scroll for more". */
+const ROW_FADE = 'linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent)';
+
+/**
+ * A labelled, horizontally scrolling chip row inside a Card. It bleeds exactly to the card's
+ * padding (p-4), never past the card's edge, and leaves room below for the selected chip's shadow.
+ */
 export const Row = ({ label, children }: { label: string; children: ReactNode }) => (
-  <div className="mb-3">
-    <div className="mb-1.5 text-[12px] font-semibold tracking-[0.08em] text-ink/50 uppercase">{label}</div>
-    <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pt-0.5 pb-1.5 [scrollbar-width:none]">
+  <div className="mb-1.5">
+    <div className="mb-1 text-[12px] font-semibold tracking-[0.08em] text-ink/50 uppercase">{label}</div>
+    <div
+      className="-mx-4 flex gap-2 overflow-x-auto px-4 pt-1 pb-3 [scrollbar-width:none]"
+      style={{ maskImage: ROW_FADE, WebkitMaskImage: ROW_FADE }}
+    >
       {children}
     </div>
   </div>
@@ -232,7 +242,7 @@ export function BigAction({
         boxShadow: `0 5px 0 ${shade}, 0 14px 24px -12px ${shade}`,
       }}
     >
-      <span className="pointer-events-none absolute inset-x-6 top-1 h-1/3 rounded-full bg-white/15" />
+      <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent" />
       <span className="relative inline-flex items-center justify-center gap-2">{children}</span>
     </motion.button>
   );

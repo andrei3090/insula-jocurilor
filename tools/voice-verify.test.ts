@@ -1,6 +1,7 @@
 // @vitest-environment node
 // Verifies staged Gemini voice clips by CONTENT: Gemini transcribes each clip, we compare with the expected text.
 // On demand only:  INSULA_VOICE_VERIFY=1 npx vitest run tools/voice-verify.test.ts
+// (INSULA_VERIFY_MODEL=gemini-3.5-flash picks another transcribing model)
 // Writes .voice-gemini/verified.json = { id: similarity 0..1 }.
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
@@ -66,8 +67,19 @@ describe.runIf(on)('staged Gemini clips say the right text', () => {
           data: readFileSync(`${dir}/${id}.m4a`).toString('base64'),
           mime_type: 'audio/m4a',
         });
-      const it = await ai.interactions.create({
-        model: 'gemini-3.8-flash',
+      // the service is sometimes busy (503) or rate-limited (429): wait and try again
+      const create = async (req: unknown, attempt = 1): Promise<unknown> => {
+        try {
+          return await ai.interactions.create(req as never);
+        } catch (e) {
+          if (attempt >= 6) throw e;
+          await new Promise((r) => setTimeout(r, 10_000 * attempt));
+          return create(req, attempt + 1);
+        }
+      };
+      const it = await create({
+        // another model can stand in while the default one is overloaded
+        model: process.env.INSULA_VERIFY_MODEL ?? 'gemini-3.8-flash',
         input: [{ type: 'user_input', content }],
         response_format: {
           type: 'text',
@@ -79,7 +91,7 @@ describe.runIf(on)('staged Gemini clips say the right text', () => {
           },
         },
         generation_config: { thinking_level: 'low' },
-      } as never);
+      });
       const t: string[] = JSON.parse((it as { output_text?: string }).output_text ?? '{"t":[]}').t ?? [];
       chunk.forEach((id, k) => {
         scores[id] = Math.round(similarity(lines[id as keyof typeof lines], t[k] ?? '') * 100) / 100;

@@ -97,8 +97,13 @@ export function alignedCutPoints(sil, total, weights) {
 /** Writes n clips; filter = extra ffmpeg audio filter for each clip; weights (syllables) enable aligned cutting. */
 export function splitInto(file, outs, filter, weights) {
   const total = duration(file);
-  const sil = silences(file);
-  const cuts = weights ? alignedCutPoints(sil, total, weights) : cutPoints(sil, total, outs.length);
+  // a fast speaker leaves short pauses between lines: look for shorter silences before giving up
+  let cuts = null;
+  for (const minDur of weights ? [0.35, 0.25, 0.18] : [0.35]) {
+    const sil = silences(file, -38, minDur);
+    cuts = weights ? alignedCutPoints(sil, total, weights) : cutPoints(sil, total, outs.length);
+    if (cuts) break;
+  }
   if (!cuts) return false;
   const bounds = [0, ...cuts, total];
   outs.forEach((out, i) => {

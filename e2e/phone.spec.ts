@@ -69,3 +69,31 @@ test('the parent app keeps its own phone layout', async ({ page }) => {
   await page.goto('./parinti/');
   expect(await page.evaluate(() => innerWidth)).toBe(360);
 });
+
+test('parent app on a phone: chip rows stay inside their card, one page colour', async ({ page }) => {
+  await page.goto('./parinti/');
+  // each tab with a card of chip rows, and a control that only that tab has (tabs cross-fade)
+  for (const [tab, mark] of [
+    ['creeaza', 'generate'],
+    ['poveste', 'make-story'],
+    ['poza', 'generate-photo'],
+  ]) {
+    await page.getByTestId(`nav-${tab}`).click();
+    await expect(page.getByTestId(mark)).toBeVisible();
+    await expect(page.getByTestId(`tab-${tab}`).locator('section .overflow-x-auto').first()).toBeVisible();
+    const outside = await page.evaluate(
+      (tab) =>
+        [...document.querySelectorAll('section')].flatMap((card) => {
+          const c = card.getBoundingClientRect();
+          return [...card.querySelectorAll('div.overflow-x-auto')]
+            .map((row) => row.getBoundingClientRect())
+            .filter((r) => r.left < c.left - 0.5 || r.right > c.right + 0.5)
+            .map((r) => `${tab}: row ${r.left}..${r.right} outside card ${c.left}..${c.right}`);
+        }),
+      tab,
+    );
+    expect(outside).toEqual([]);
+  }
+  const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  expect(bg).toBe('rgb(250, 246, 255)');
+});

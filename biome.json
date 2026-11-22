@@ -6,6 +6,7 @@
       "!dist",
       "!dev-dist",
       "!public/audio",
+      "!.voice-gemini",
       "!test-results",
       "!playwright-report",
       "!node_modules"

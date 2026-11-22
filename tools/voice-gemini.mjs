@@ -2,7 +2,7 @@
 // The API key is read from the macOS Keychain:  security add-generic-password -a insula -s gemini-api-key -w
 //
 //   node --experimental-strip-types --no-warnings tools/voice-gemini.mjs samples   → ../docs/voci-gemini/<character>.m4a
-//   … voice-gemini.mjs batch [regex] → .voice-gemini/ (staging): up to 25 lines of one character per request,
+//   … voice-gemini.mjs batch [regex] → .voice-gemini/ (staging): up to 25 lines (INSULA_TTS_CHUNK) of one character per request,
 //                                     split at the pauses (fits the free tier's ~10 requests/day)
 //   … voice-gemini.mjs install        → copies a COMPLETE staging set into public/audio (then set ENGINE = 'gemini')
 //   … voice-gemini.mjs all [regex]    → one request per line, straight into public/audio (paid tier)
@@ -73,6 +73,8 @@ function toM4a(wav, out, extra = []) {
 }
 
 const mode = process.argv[2] ?? 'samples';
+// lines per batch request: fewer lines cut more reliably, more lines save the daily quota
+const CHUNK = Number(process.env.INSULA_TTS_CHUNK ?? 25);
 const LOUD = 'loudnorm=I=-16:TP=-1.5:LRA=11';
 const stageDir = new URL('../.voice-gemini/', import.meta.url).pathname;
 const stageManifest = join(stageDir, 'manifest.json');
@@ -98,8 +100,8 @@ if (mode === 'batch') {
   outer: for (const [k, items] of groups) {
     const [who, counting] = k.split('|');
     const cfg = GEMINI[who];
-    for (let i = 0; i < items.length; i += 25) {
-      const chunk = items.slice(i, i + 25);
+    for (let i = 0; i < items.length; i += CHUNK) {
+      const chunk = items.slice(i, i + CHUNK);
       const text = chunk.map(([, t]) => (/[.!?]$/.test(t) ? t : `${t}.`)).join(' <long pause> ');
       let wav;
       try {

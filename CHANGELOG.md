@@ -1,5 +1,10 @@
 # Ce e nou
 
+## 0.6.2 (22.11.2026)
+
+- Mai multe voci naturale: titlul jocului cu ursuleții, potrivirile lor, literele din Alfabet și încă câteva replici vorbesc acum cu vocea caldă a personajelor, nu cu vocea robotică. Restul replicilor vin în actualizarea următoare.
+- Aplicația părinților pe telefon: rândurile cu opțiuni nu mai ies din chenar, se estompează frumos la margine ca să se vadă că mai sunt opțiuni, iar umbra butonului ales nu mai e tăiată. Fundalul paginii e la fel peste tot, inclusiv sub bara de jos.
+
 ## 0.6.1 (22.11.2026)
 
 - Aplicația copiilor merge și pe telefon: pe un ecran mic arată exact ca pe tabletă, doar micșorată, ținut drept sau culcat; nimic nu mai e tăiat.
