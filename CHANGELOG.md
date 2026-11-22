@@ -1,5 +1,10 @@
 # Ce e nou
 
+## 0.6.1 (22.11.2026)
+
+- Aplicația copiilor merge și pe telefon: pe un ecran mic arată exact ca pe tabletă, doar micșorată, ținut drept sau culcat; nimic nu mai e tăiat.
+- Xilofonul lui Bruno: în poziția verticală toate cele 8 clape încap pe ecran.
+
 ## 0.6.0 (22.11.2026)
 
 - Personajele prind viață: dacă le atingi, sar, fac cu mâna sau dansează, chicotesc fiecare cu vocea lui, iar pe insula lor spun și câte ceva („Hihi! Mă gâdili!”).

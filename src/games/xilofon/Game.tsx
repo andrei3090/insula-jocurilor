@@ -181,10 +181,10 @@ export default function XilofonGame({ level, onItem, voice, hints, registerTest 
                 ? { duration: 0.9, repeat: Number.POSITIVE_INFINITY }
                 : { type: 'spring', stiffness: 600, damping: 20 }
             }
-            className="relative rounded-[1.2rem] border-4 border-ink/80 shadow-[0_6px_0_rgba(59,42,74,0.35)]"
+            // 8 bars must fit a 640 px wide portrait screen (tablet upright, or a phone): narrower there
+            className="relative w-[78px] rounded-[1.2rem] border-4 border-ink/80 shadow-[0_6px_0_rgba(59,42,74,0.35)] portrait:w-[62px]"
             style={{
               background: c,
-              width: 78,
               height: 300 - i * 22,
               boxShadow:
                 lit === i || guide === i ? `0 0 0 8px ${c}66, 0 6px 0 rgba(59,42,74,0.35)` : undefined,
