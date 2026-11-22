@@ -10,6 +10,8 @@ const SCORED = [
   { id: 'abc', island: 'laguna' },
   { id: 'cifre', island: 'bambus' },
   { id: 'xilofon', island: 'pestera' },
+  // one drawing is a whole round: the sticker comes right after it
+  { id: 'ghidat', island: 'atelier', one: true },
 ];
 
 for (const g of SCORED) {
@@ -24,7 +26,10 @@ for (const g of SCORED) {
     await expect(page.getByTestId('round-end')).toHaveCount(0);
     await page.evaluate(() => window.__test!.solve());
     await expect(page.getByTestId('bead-done')).toHaveCount(1, { timeout: 8000 });
-    await page.getByTestId('home').click();
+    if ('one' in g) {
+      await expect(page.getByTestId('round-end')).toBeVisible({ timeout: 8000 });
+      await page.getByTestId('round-home').click();
+    } else await page.getByTestId('home').click();
     await expect(page.getByTestId(`island-screen-${g.island}`)).toBeVisible();
   });
 }

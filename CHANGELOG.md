@@ -1,5 +1,10 @@
 # Ce e nou
 
+## 0.5.0 (22.11.2026)
+
+- Joc nou în Atelier: Desenăm cu Pufi. Copilul alege un desen (soarele, peștișorul, floarea, Pufi, ursulețul, țestoasa sau castelul Cenușăresei) și îl desenează pas cu pas cu creionul, pe linia punctată, în timp ce Pufi îi spune ce formă urmează (cerc, oval, triunghi, pătrat, linie).
+- La final își colorează propriul desen: culoarea rămâne între liniile desenate de ea. Desenul ajunge în album, iar ea primește un abțibild.
+
 ## 0.4.1 (22.11.2026)
 
 - Sunetul respectă mereu modul silențios al telefonului sau tabletei.

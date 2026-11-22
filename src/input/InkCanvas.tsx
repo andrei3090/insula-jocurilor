@@ -24,6 +24,8 @@ export type InkHandle = {
   addStamp(src: string, x: number, y: number, size: number): void;
   items(): InkItem[];
   toBlob(layers?: { under?: Paint; over?: Paint }): Promise<Blob | null>;
+  /** the committed ink layer (device pixels), e.g. to read her lines for a flood fill */
+  canvas(): HTMLCanvasElement | null;
 };
 
 type Props = {
@@ -196,6 +198,7 @@ export const InkCanvas = forwardRef<InkHandle, Props>(function InkCanvas(
         redrawBase();
       },
       items: () => [...items.current],
+      canvas: () => base.current,
       async toBlob(layers) {
         const b = base.current;
         if (!b) return null;
