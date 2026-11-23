@@ -1,5 +1,14 @@
 # Ce e nou
 
+## 0.8.0 (23.11.2026)
+
+- După „Hai să ne jucăm!” copilul alege câți ani are: 3–4 ani sau 5–7 ani. Insulele arată apoi jocurile potrivite vârstei (vârsta exactă se poate pune și în zona părinților).
+- Joc nou pentru 3–4 ani, pe Castelul de cristal: Bule de săpun. Spargi bulele de culoarea spusă, apoi atâtea bule câte spune Cenușăreasa (numărând cu voce tare), apoi bulele cu cifra spusă.
+- Joc nou pentru 3–4 ani, în Peștera urșilor: Umbrele animalelor. Găsești umbra animalului atingând-o sau trăgând animalul peste ea; la nivelurile mai mari umbrele seamănă între ele.
+- Joc nou pentru 5–7 ani, în Peștera urșilor: Modele în peșteră. Continui un șir de forme și culori (AB, AAB, ABC…) sau găsești piesa care lipsește din mijloc.
+- Joc nou pentru 5–7 ani, în Laguna stelelor: Navigatorul stelelor. Pui săgeți ca Marina să ajungă cu barca pe insulă, ocolind stâncile: primii pași în programare.
+- Fiecare joc nou are 50 de niveluri, stele și voci naturale în română și engleză.
+
 ## 0.7.0 (23.11.2026)
 
 - Toate vocile sunt acum naturale, nicio voce robotică. Am verificat fiecare replică ascultând-o, iar cele tăiate greșit (care spuneau și o bucată din replica următoare) sunt reparate.

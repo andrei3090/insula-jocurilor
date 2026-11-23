@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
-import { openGame, start } from './helpers';
+import { openGame, pickAge, start } from './helpers';
 
 /** Plays one round of "Memorie la bal" (3 items); `stumble` makes every item need a hint first. */
 async function playRound(page: Page, stumble = false) {
@@ -90,6 +90,7 @@ test.describe('language and reset at the start screen', () => {
     await expect(page.getByTestId('start')).toContainText("Let's play!");
     expect(await page.evaluate(() => document.documentElement.lang)).toBe('en');
     await page.getByTestId('start').click();
+    await pickAge(page);
     await expect(page.getByTestId('island-bambus')).toHaveAttribute('aria-label', 'Bamboo Forest');
     await page.getByTestId('island-bambus').click();
     await expect(page.getByTestId('card-panda')).toContainText('Feed Pufi');

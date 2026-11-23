@@ -12,13 +12,18 @@ const SCORED = [
   { id: 'xilofon', island: 'pestera' },
   // one drawing is a whole round: the sticker comes right after it
   { id: 'ghidat', island: 'atelier', one: true },
+  // the new games of each age group
+  { id: 'bule', island: 'castel' },
+  { id: 'umbre', island: 'pestera' },
+  { id: 'modele', island: 'pestera', group: 'big' as const },
+  { id: 'navigator', island: 'laguna', group: 'big' as const },
 ];
 
 for (const g of SCORED) {
   test(`${g.id}: a wrong answer gives a hint (no fail screen), a right one moves a bead`, async ({
     page,
   }) => {
-    await start(page);
+    await start(page, 'group' in g ? g.group : 'small');
     await openGame(page, g.island, g.id);
     await page.evaluate(() => window.__test!.fail());
     await page.waitForTimeout(500);

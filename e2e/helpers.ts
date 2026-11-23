@@ -1,8 +1,15 @@
 import { expect, type Page } from '@playwright/test';
 
-export async function start(page: Page) {
+/** Start screen → age group (3–4 by default, the default child is 4) → the map. */
+export async function start(page: Page, group: 'small' | 'big' = 'small') {
   await page.goto('./');
   await page.getByTestId('start').click();
+  await pickAge(page, group);
+}
+
+export async function pickAge(page: Page, group: 'small' | 'big' = 'small') {
+  await expect(page.getByTestId('age-screen')).toBeVisible();
+  await page.getByTestId(`age-${group}`).click();
   await expect(page.getByTestId('map')).toBeVisible();
 }
 

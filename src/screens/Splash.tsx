@@ -65,7 +65,7 @@ export function Splash() {
     void askPersistentStorage();
     useSession.getState().start();
     void say('app.hello');
-    go({ name: 'map' });
+    go({ name: 'age' });
   };
 
   const pickLang = async (l: Lang) => {

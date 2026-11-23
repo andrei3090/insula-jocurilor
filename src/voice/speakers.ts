@@ -16,9 +16,12 @@ export const SPEAKERS: Record<Speaker, { pitch: number; tempo: number }> = {
 };
 
 const RULES: [RegExp, Speaker][] = [
-  [/^(island\.pestera|game\.ursi|ursi\.|game\.xilofon|xilo\.|tap\.bruno\.)/, 'bruno'],
-  [/^(island\.castel|game\.memorie|memorie\.|tap\.cenusareasa\.)/, 'cenusareasa'],
-  [/^(island\.laguna|game\.nisip|nisip\.|letter\.|tap\.marina\.)/, 'marina'],
+  [
+    /^(island\.pestera|game\.ursi|ursi\.|game\.xilofon|xilo\.|tap\.bruno\.|game\.umbre|umbre\.|anim\.|game\.modele|modele\.)/,
+    'bruno',
+  ],
+  [/^(island\.castel|game\.memorie|memorie\.|tap\.cenusareasa\.|game\.bule|bule\.)/, 'cenusareasa'],
+  [/^(island\.laguna|game\.nisip|nisip\.|letter\.|tap\.marina\.|game\.navigator|nav\.)/, 'marina'],
   [/^(island\.atelier|game\.desen|desen\.|game\.coloreaza|coloreaza\.|tap\.tavi\.)/, 'tavi'],
 ];
 
@@ -28,13 +31,20 @@ export const speakerFor = (id: string): Speaker => RULES.find(([re]) => re.test(
 export type Engine = 'ioana' | 'gemini';
 /** flash-lite-tts: natural Romanian voices with its own (separate) free-tier quota. */
 export const GEMINI_MODEL = 'gemini-3.8-flash-lite-tts';
+/**
+ * The second TTS model (same voices, its own free daily quota). Used for whole games at a time, so every game
+ * sounds even: the shadows, the patterns and the navigator (23.11.2026).
+ */
+export const GEMINI_MODEL_ALT = 'gemini-3.8-flash-tts';
+const ALT = /^(game\.umbre|umbre\.|anim\.|game\.modele|modele\.|game\.navigator|nav\.)/;
+export const geminiModelFor = (id: string) => (ALT.test(id) ? GEMINI_MODEL_ALT : GEMINI_MODEL);
 
 /** Everything that changes the sound of a clip (hashed into the clip manifest). */
 export const clipKey = (id: string, text: string, engine: Engine) => {
   if (engine === 'gemini') {
     const g = GEMINI[speakerFor(id)];
     const style = id.startsWith('num.') || id === 'si' ? g.countStyle : g.style;
-    return `gemini|${GEMINI_MODEL}|${g.voice}|${style}|${text}`;
+    return `gemini|${geminiModelFor(id)}|${g.voice}|${style}|${text}`;
   }
   const s = SPEAKERS[speakerFor(id)];
   return `${VOICE.name}|${VOICE.rate}|${s.pitch}|${s.tempo}|${text}`;

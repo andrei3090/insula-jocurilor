@@ -11,15 +11,13 @@ import { BookIcon } from '../ui/icons';
 import { LockButton } from '../ui/ParentGate';
 import { Waves } from './Waves';
 
-let greeted = false;
-
 export function WorldMap() {
   const go = useRouter((s) => s.go);
   const t = useT();
   const reduce = useReducedMotion();
   useEffect(() => {
-    if (greeted) void voice.say('map.choose');
-    greeted = true;
+    // after the age screen: "choose an island" (queued after what Pufi is still saying)
+    void voice.say('map.choose');
     // leaving this screen is her own choice: what it was saying is over
     return () => voice.stop();
   }, []);

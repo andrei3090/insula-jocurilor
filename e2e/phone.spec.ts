@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
+import { pickAge } from './helpers';
 
 // The child app on a phone: the tablet layout, scaled down, nothing clipped (bug B18).
 test.use({ viewport: { width: 360, height: 780 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
@@ -19,6 +20,9 @@ async function fullyVisible(page: Page, testId: string) {
 async function walk(page: Page) {
   await fullyVisible(page, 'start');
   await page.getByTestId('start').click();
+  await fullyVisible(page, 'age-small');
+  await fullyVisible(page, 'age-big');
+  await pickAge(page);
   for (const id of ['bambus', 'pestera', 'castel', 'laguna', 'atelier'])
     await fullyVisible(page, `island-${id}`);
   await fullyVisible(page, 'album');
@@ -52,6 +56,7 @@ test('phone turned sideways: it rescales and still fits', async ({ page }) => {
 test('phone portrait: all eight xylophone bars are on screen', async ({ page }) => {
   await page.goto('./');
   await page.getByTestId('start').click();
+  await pickAge(page);
   await page.getByTestId('island-pestera').click();
   await page.getByTestId('card-xilofon').click();
   for (let i = 0; i < 8; i++) await fullyVisible(page, `bar-${i}`);

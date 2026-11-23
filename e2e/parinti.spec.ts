@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { pickAge } from './helpers';
 
 test.use({ viewport: { width: 390, height: 844 } });
 
@@ -78,6 +79,7 @@ test('the child app never calls the network for AI', async ({ page }) => {
   });
   await page.goto('./');
   await page.getByTestId('start').click();
+  await pickAge(page);
   await page.getByTestId('island-bambus').click();
   await page.getByTestId('card-panda').click();
   await page.waitForTimeout(1500);

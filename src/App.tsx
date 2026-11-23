@@ -7,6 +7,7 @@ import { gameById } from './core/registry';
 import { type Route, useRouter } from './core/router';
 import { maybeApplyUpdate } from './core/update';
 import { useLang } from './i18n/ui';
+import { AgePicker } from './screens/AgePicker';
 import { Album } from './screens/Album';
 import { ArtSheet } from './screens/dev/ArtSheet';
 import { GameHost } from './screens/GameHost';
@@ -20,6 +21,8 @@ function Screen({ route }: { route: Route }) {
   switch (route.name) {
     case 'splash':
       return <Splash />;
+    case 'age':
+      return <AgePicker />;
     case 'map':
       return <WorldMap />;
     case 'island':

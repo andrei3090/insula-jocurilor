@@ -161,7 +161,7 @@ export function ParentHome() {
           </label>
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <span className="mr-2">{t('p.age')}</span>
-            {[4, 5, 6, 7, 8, 9, 10].map((a) => (
+            {[3, 4, 5, 6, 7, 8, 9, 10].map((a) => (
               <Pill key={a} on={me.age === a} onClick={() => p.update(me.id, { age: a })}>
                 {a}
               </Pill>

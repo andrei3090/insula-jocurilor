@@ -3,6 +3,7 @@ import type { IslandId } from './types';
 
 export type Route =
   | { name: 'splash' }
+  | { name: 'age' }
   | { name: 'map' }
   | { name: 'island'; island: IslandId }
   | { name: 'game'; id: string; island: IslandId }
@@ -17,6 +18,8 @@ export function parentOf(r: Route): Route {
   switch (r.name) {
     case 'game':
       return { name: 'island', island: r.island };
+    case 'age':
+      return { name: 'splash' };
     case 'island':
     case 'album':
     case 'parent':

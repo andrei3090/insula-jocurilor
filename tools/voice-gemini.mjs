@@ -13,7 +13,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { GoogleGenAI } from '@google/genai';
 import { lines } from '../src/voice/lines.ts';
-import { clipKey, GEMINI, GEMINI_MODEL, speakerFor } from '../src/voice/speakers.ts';
+import { clipKey, GEMINI, GEMINI_MODEL, geminiModelFor, speakerFor } from '../src/voice/speakers.ts';
 import { splitInto } from './split-silence.mjs';
 
 const MODEL = GEMINI_MODEL;
@@ -24,10 +24,10 @@ const ai = new GoogleGenAI({ apiKey: key, httpOptions: { apiVersion: 'v1beta' } 
 const hash = (s) => createHash('sha1').update(s).digest('hex').slice(0, 12);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function tts(text, voice, style, attempt = 1) {
+async function tts(text, voice, style, model = MODEL, attempt = 1) {
   try {
     const it = await ai.interactions.create({
-      model: MODEL,
+      model,
       input: [
         {
           type: 'user_input',
@@ -41,7 +41,7 @@ async function tts(text, voice, style, attempt = 1) {
   } catch (e) {
     if (attempt < 5) {
       await sleep(4000 * attempt);
-      return tts(text, voice, style, attempt + 1);
+      return tts(text, voice, style, model, attempt + 1);
     }
     throw e;
   }
@@ -92,20 +92,21 @@ if (mode === 'batch') {
   for (const [id, text] of pending) {
     const who = speakerFor(id);
     const counting = id.startsWith('num.') || id === 'si';
-    const k = `${who}|${counting}`;
+    // a group per character, style and TTS model
+    const k = `${who}|${counting}|${geminiModelFor(id)}`;
     if (!groups.has(k)) groups.set(k, []);
     groups.get(k).push([id, text]);
   }
   let requests = 0;
   outer: for (const [k, items] of groups) {
-    const [who, counting] = k.split('|');
+    const [who, counting, model] = k.split('|');
     const cfg = GEMINI[who];
     for (let i = 0; i < items.length; i += CHUNK) {
       const chunk = items.slice(i, i + CHUNK);
       const text = chunk.map(([, t]) => (/[.!?]$/.test(t) ? t : `${t}.`)).join(' <long pause> ');
       let wav;
       try {
-        wav = await tts(text, cfg.voice, counting === 'true' ? cfg.countStyle : cfg.style);
+        wav = await tts(text, cfg.voice, counting === 'true' ? cfg.countStyle : cfg.style, model);
       } catch (e) {
         console.log(
           `\nstopped (${String(e?.message ?? e).slice(0, 120)}); run again later, progress is kept`,

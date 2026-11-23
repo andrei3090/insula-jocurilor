@@ -13,9 +13,23 @@ const ALL = Array.from({ length: MAX_LEVEL }, (_, i) => i + 1);
 
 describe('every learning game has 50 levels that get harder, never easier', () => {
   const leveled = games().filter((g) => g.levelSpec);
-  it('the nine learning games have levels; free drawing and colouring do not', () => {
+  it('the thirteen learning games have levels; free drawing and colouring do not', () => {
     expect(leveled.map((g) => g.id).sort()).toEqual(
-      ['abc', 'cifre', 'ghidat', 'memorie', 'nisip', 'panda', 'puncte', 'ursi', 'xilofon'].sort(),
+      [
+        'abc',
+        'bule',
+        'cifre',
+        'ghidat',
+        'memorie',
+        'modele',
+        'navigator',
+        'nisip',
+        'panda',
+        'puncte',
+        'umbre',
+        'ursi',
+        'xilofon',
+      ].sort(),
     );
   });
 

@@ -46,6 +46,8 @@ test('one voice at a time: in a played round no sentence is cut by the app itsel
   };
   await page.goto('./');
   await tap('start');
+  await page.waitForTimeout(1200);
+  await tap('age-small');
   await page.waitForTimeout(1500);
   await tap('island-castel');
   await page.waitForTimeout(1500);
