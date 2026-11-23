@@ -50,6 +50,7 @@ export function cutPoints(sil, total, n) {
  */
 export function alignedCutPoints(sil, total, weights) {
   const n = weights.length;
+  if (n <= 1) return []; // one line: nothing to cut (a pause inside it is not a boundary)
   const cands = sil
     .filter((s) => s.start > 0.15 && s.end < total - 0.15 && s.dur >= 0.18)
     .map((s) => ({ c: (s.start + s.end) / 2, d: s.dur }));

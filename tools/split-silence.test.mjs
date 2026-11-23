@@ -31,6 +31,11 @@ describe('split on silence', () => {
     expect(cutPoints(sil, 10, 3)?.some((c) => Math.abs(c - 5.2) < 1e-9)).toBe(true); // the old method cut inside line 2
   });
 
+  it('alignedCutPoints: a take of one line needs no cut, with or without pauses inside it', () => {
+    expect(alignedCutPoints([{ start: 1, end: 1.5, dur: 0.5 }], 3, [5])).toEqual([]);
+    expect(alignedCutPoints([], 3, [5])).toEqual([]);
+  });
+
   it.runIf(hasFfmpeg)(
     'splits a real recording of 3 "lines" (tones 0.6 s, 1.0 s, 0.4 s with 1.2 s pauses) into 3 clips',
     () => {

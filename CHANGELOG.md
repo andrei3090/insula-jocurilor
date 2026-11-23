@@ -1,5 +1,9 @@
 # Ce e nou
 
+## 0.6.5 (23.11.2026)
+
+- Cifrele vii vorbesc acum în întregime cu vocea naturală. Xilofonul lui Bruno, Desenăm cu Pufi și Bruno, când îl atingi, au și ele mai multe replici cu vocea naturală. Mai rămân câteva replici pentru actualizarea următoare.
+
 ## 0.6.4 (22.11.2026)
 
 - Unește punctele, Alfabetul și alegerea din Scrie pe nisip vorbesc acum cu vocea naturală. Mai rămân Xilofonul, Cifrele și cea mai mare parte din Desenăm cu Pufi, pentru actualizarea următoare.
