@@ -56,3 +56,30 @@ export const TrashIcon = ({ size = 40 }: { size?: number }) => (
     <path d="M14 18 H50 M26 18 V12 H38 V18 M18 18 L22 54 H42 L46 18" fill="#ffe3a8" {...s} />
   </svg>
 );
+
+/** `color` for a star on a yellow (sun) background, where the default gold would vanish. */
+export const StarIcon = ({
+  size = 40,
+  on = true,
+  color = '#ffd166',
+}: {
+  size?: number;
+  on?: boolean;
+  color?: string;
+}) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
+    <path
+      d="M12 2.2l2.9 6.2 6.8.7-5.1 4.6 1.5 6.7L12 16.9l-6.1 3.5 1.5-6.7-5.1-4.6 6.8-.7z"
+      fill={on ? color : '#e9e2f2'}
+      stroke="#3b2a4a"
+      strokeWidth={1.6}
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const NextIcon = ({ size = 56 }: { size?: number }) => (
+  <svg viewBox="0 0 64 64" width={size} height={size} aria-hidden="true">
+    <path d="M18 12 L48 32 L18 52 Z" fill="#fff" stroke="#3b2a4a" strokeWidth={4} strokeLinejoin="round" />
+  </svg>
+);

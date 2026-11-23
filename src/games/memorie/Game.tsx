@@ -5,6 +5,7 @@ import { GUIDES } from '../../art/guides';
 import { sfx } from '../../audio/sfx';
 import { randomSeed, rng } from '../../core/rng';
 import type { GameProps } from '../../core/types';
+import { useT } from '../../i18n/ui';
 import {
   close,
   type Face,
@@ -58,9 +59,12 @@ function Back({ size }: { size: number }) {
 const PEEK_MS = 1600;
 
 export default function MemorieGame({ level, onItem, voice, hints, registerTest }: GameProps) {
+  const t = useT();
   const skill = level.skill as MemSkill;
   const rand = useRef(rng(randomSeed()));
-  const [deck, setDeck] = useState<MemCard[]>(() => makeDeck(skill, rand.current));
+  const [deck, setDeck] = useState<MemCard[]>(() =>
+    makeDeck(skill, rand.current, level.spec.numbers as number | undefined),
+  );
   const [st, setSt] = useState(initial);
   const [peek, setPeek] = useState(false);
   const started = useRef(Date.now());
@@ -112,7 +116,7 @@ export default function MemorieGame({ level, onItem, voice, hints, registerTest 
       hintsUsed: hints.rung,
       ms: Date.now() - started.current,
     });
-    setDeck(makeDeck(skill, rand.current));
+    setDeck(makeDeck(skill, rand.current, level.spec.numbers as number | undefined));
     setSt(initial());
     hints.reset();
     started.current = Date.now();
@@ -126,7 +130,7 @@ export default function MemorieGame({ level, onItem, voice, hints, registerTest 
     if (ev === 'match') {
       sfx.chime();
       if (solved(next, deck)) void boardDone(next);
-      else void voice.say('memorie.pair');
+      else void voice.say('memorie.pair', 'now');
     }
     if (ev === 'mismatch') {
       sfx.swish();
@@ -161,7 +165,7 @@ export default function MemorieGame({ level, onItem, voice, hints, registerTest 
               <motion.button
                 key={c.uid}
                 type="button"
-                aria-label={up ? 'carte întoarsă' : 'carte'}
+                aria-label={up ? t('mem.cardUp') : t('mem.card')}
                 data-testid="card"
                 onClick={() => tap(c.uid)}
                 style={{ width: cell, height: cell, transformStyle: 'preserve-3d' }}

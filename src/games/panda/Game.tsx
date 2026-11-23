@@ -6,6 +6,7 @@ import type { Mood } from '../../art/parts';
 import { sfx } from '../../audio/sfx';
 import { randomSeed, rng } from '../../core/rng';
 import type { GameProps } from '../../core/types';
+import { useT } from '../../i18n/ui';
 import { BigButton } from '../../ui/BigButton';
 import { DemoHand } from '../../ui/DemoHand';
 import { CheckIcon } from '../../ui/icons';
@@ -22,8 +23,16 @@ function promptFor(it: PandaItem): LineId[] {
 }
 
 export default function PandaGame({ level, onItem, voice, hints, registerTest }: GameProps) {
+  const t = useT();
   const rand = useRef(rng(randomSeed()));
-  const [item, setItem] = useState<PandaItem>(() => makeItem(level.skill as PandaSkill, rand.current));
+  const [item, setItem] = useState<PandaItem>(() =>
+    makeItem(
+      level.skill as PandaSkill,
+      rand.current,
+      undefined,
+      level.spec.range as [number, number] | undefined,
+    ),
+  );
   const [placed, setPlaced] = useState<number[]>([]); // ids of loose sticks in the basket
   const [phase, setPhase] = useState<Phase>('place');
   const [mood, setMood] = useState<Mood>('wave');
@@ -87,7 +96,7 @@ export default function PandaGame({ level, onItem, voice, hints, registerTest }:
     const next = [...placed, id];
     setPlaced(next);
     sfx.pop();
-    void voice.say(numberLine(item.a + next.length));
+    void voice.say(numberLine(item.a + next.length, level.lang), 'now');
   };
 
   const takeBack = (id: number) => {
@@ -99,7 +108,7 @@ export default function PandaGame({ level, onItem, voice, hints, registerTest }:
   const finish = useCallback(async () => {
     setPhase('busy');
     setMood('happy');
-    await voice.say('panda.yum');
+    await voice.say('panda.yum', 'now');
     await onItem({
       skill: level.skill,
       correct: mistakes.current === 0,
@@ -107,8 +116,15 @@ export default function PandaGame({ level, onItem, voice, hints, registerTest }:
       ms: Date.now() - started.current,
       itemId: `${item.mode}-${item.target}`,
     });
-    start(makeItem(level.skill as PandaSkill, rand.current, item.target));
-  }, [voice, onItem, level.skill, hints.rung, item, start]);
+    start(
+      makeItem(
+        level.skill as PandaSkill,
+        rand.current,
+        item.target,
+        level.spec.range as [number, number] | undefined,
+      ),
+    );
+  }, [voice, onItem, level.skill, level.spec.range, hints.rung, item, start]);
 
   const done = (count = placed.length) => {
     if (phase !== 'place') return;
@@ -185,7 +201,7 @@ export default function PandaGame({ level, onItem, voice, hints, registerTest }:
                   key={id}
                   layoutId={`stick-${id}`}
                   type="button"
-                  aria-label="Scoate bățul din coș"
+                  aria-label={t('panda.takeOut')}
                   onClick={() => takeBack(id)}
                   className="relative"
                 >
@@ -237,7 +253,7 @@ export default function PandaGame({ level, onItem, voice, hints, registerTest }:
                       <motion.button
                         layoutId={`stick-${id}`}
                         type="button"
-                        aria-label="Băț de bambus"
+                        aria-label={t('panda.stick')}
                         data-testid="stick"
                         disabled={blocked || phase !== 'place'}
                         onClick={() => put(id)}
@@ -267,7 +283,14 @@ export default function PandaGame({ level, onItem, voice, hints, registerTest }:
             </div>
           )}
           {phase === 'place' && (
-            <BigButton label="Gata" tone="bamboo" size={120} round onPress={() => done()} testId="done">
+            <BigButton
+              label={t('panda.done')}
+              tone="bamboo"
+              size={120}
+              round
+              onPress={() => done()}
+              testId="done"
+            >
               <CheckIcon size={70} color="#3b2a4a" />
             </BigButton>
           )}

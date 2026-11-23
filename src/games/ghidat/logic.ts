@@ -1,3 +1,4 @@
+import type { LevelSpec } from '../../core/levels';
 import { dist, distToPath, type Pt, pathLength, resample } from '../nisip/geometry';
 import { type Tol, tolerancesForAge } from '../nisip/logic';
 
@@ -197,4 +198,12 @@ export function growInto(mask: Uint8Array, barrier: Uint8Array, w: number, steps
     cur = next;
   }
   return cur;
+}
+
+/**
+ * Levels 1…50. She still chooses what to draw; the level opens one more drawing every second level (simplest
+ * first) and asks for a fuller line: 80% → 92% of each guide.
+ */
+export function levelSpec(n: number): LevelSpec & { skill: 'draw.shapes'; open: number; need: number } {
+  return { skill: 'draw.shapes', open: Math.min(7, Math.ceil(n / 2)), need: 0.8 + 0.12 * ((n - 1) / 49) };
 }

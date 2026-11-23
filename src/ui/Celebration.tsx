@@ -3,9 +3,11 @@ import { motion, useReducedMotion } from 'motion/react';
 import { useEffect, useMemo } from 'react';
 import { Emoji, type EmojiName } from '../art/Emoji';
 import { LiveGuide } from '../art/LiveGuide';
+import type { Stars } from '../core/levels';
 import type { Avatar } from '../core/profile';
+import { useT } from '../i18n/ui';
 import { BigButton } from './BigButton';
-import { AgainIcon, HouseIcon } from './icons';
+import { AgainIcon, HouseIcon, NextIcon, StarIcon } from './icons';
 
 const COLORS = ['#ffd166', '#ff8a80', '#4cc9c0', '#8fd16a', '#b39ddb', '#f8bbd0'];
 
@@ -52,15 +54,24 @@ export function StarBurst({ x = '50%', y = '45%' }: { x?: string; y?: string }) 
 export function RoundEnd({
   sticker,
   guide,
+  stars,
+  next,
+  onNext,
   onAgain,
   onHome,
 }: {
   sticker: EmojiName | null;
   guide?: Avatar;
+  /** 1–3 stars for the round (games with levels) */
+  stars?: Stars;
+  /** the level to go on to; absent when she plays this level once more */
+  next?: number;
+  onNext?(n: number): void;
   onAgain(): void;
   onHome(): void;
 }) {
   const reduce = useReducedMotion();
+  const t = useT();
   useEffect(() => {
     if (reduce) return;
     const end = Date.now() + 900;
@@ -106,15 +117,43 @@ export function RoundEnd({
               animate={{ rotate: 0, scale: 1 }}
               transition={{ delay: 0.35, type: 'spring', stiffness: 220, damping: 12 }}
             >
-              <Emoji name={sticker} size={110} label="Abțibild nou" />
+              <Emoji name={sticker} size={110} label={t('sticker.new')} />
             </motion.div>
           )}
         </div>
+        {stars && (
+          <div
+            className="flex gap-3"
+            role="img"
+            data-testid="round-stars"
+            data-stars={stars}
+            aria-label={t('level.stars', { n: stars })}
+          >
+            {[1, 2, 3].map((k) => (
+              <motion.span
+                key={k}
+                initial={{ scale: 0, rotate: -40 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.3 + k * 0.18, type: 'spring', stiffness: 260, damping: 12 }}
+              >
+                <StarIcon size={72} on={k <= stars} />
+              </motion.span>
+            ))}
+          </div>
+        )}
         <div className="flex gap-6">
-          <BigButton label="Încă o dată" tone="lagoon" onPress={onAgain} testId="again">
+          {next && onNext && (
+            <BigButton label={t('level.next')} tone="bamboo" onPress={() => onNext(next)} testId="next-level">
+              <span className="flex items-center gap-2 px-2">
+                <NextIcon size={60} />
+                <span className="text-4xl font-bold text-white">{next}</span>
+              </span>
+            </BigButton>
+          )}
+          <BigButton label={t('again')} tone="lagoon" onPress={onAgain} testId="again">
             <AgainIcon size={60} />
           </BigButton>
-          <BigButton label="Înapoi pe insulă" tone="sun" onPress={onHome} testId="round-home">
+          <BigButton label={t('backIsland')} tone="sun" onPress={onHome} testId="round-home">
             <HouseIcon size={60} />
           </BigButton>
         </div>

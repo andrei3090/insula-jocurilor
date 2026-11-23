@@ -4,6 +4,7 @@ import { Emoji, type EmojiName } from '../../art/Emoji';
 import { sfx } from '../../audio/sfx';
 import { pick, randomSeed, rng } from '../../core/rng';
 import type { GameProps } from '../../core/types';
+import { useT } from '../../i18n/ui';
 import { Balloon } from '../../ui/Balloon';
 import { GlyphCard } from '../../ui/GlyphCard';
 import { numberLine } from '../../voice/numbers';
@@ -25,15 +26,17 @@ const ANIMALS: EmojiName[] = [
 type Phase = 'meet' | 'counting' | 'choose' | 'busy';
 
 export default function CifreGame({ level, onItem, voice, hints, registerTest }: GameProps) {
+  const t = useT();
   const skill = level.skill as CifreSkill;
   const mode = modeOf(skill);
-  const max = maxOf(skill);
+  const max = (level.spec.max as number | undefined) ?? maxOf(skill);
+  const choices = (level.spec.choices as number | undefined) ?? 3;
   const rand = useRef(rng(randomSeed()));
-  const [digit, setDigit] = useState(() => pickDigit(skill, rand.current));
+  const [digit, setDigit] = useState(() => pickDigit(skill, rand.current, undefined, max));
   const [animal, setAnimal] = useState<EmojiName>(() => pick(rand.current, ANIMALS));
   const [shown, setShown] = useState(mode === 'count' ? digit : 0);
   const [phase, setPhase] = useState<Phase>(mode === 'count' ? 'choose' : 'meet');
-  const [options, setOptions] = useState(() => digitOptions(digit, max, rand.current));
+  const [options, setOptions] = useState(() => digitOptions(digit, max, rand.current, choices));
   const [wrong, setWrong] = useState<number | null>(null);
   const [popped, setPopped] = useState<number | null>(null);
   const mistakes = useRef(0);
@@ -51,13 +54,13 @@ export default function CifreGame({ level, onItem, voice, hints, registerTest }:
 
   const tapDigit = () => {
     if (phase !== 'meet') {
-      void voice.say(numberLine(digit));
+      void voice.say(numberLine(digit, level.lang), 'now');
       return;
     }
     setPhase('counting');
     sfx.chime();
     if (digit === 0) {
-      void voice.say('num.0');
+      void voice.say('num.0', 'now');
       timers.current.push(
         setTimeout(() => {
           setPhase('choose');
@@ -71,7 +74,7 @@ export default function CifreGame({ level, onItem, voice, hints, registerTest }:
         setTimeout(() => {
           setShown(k);
           sfx.pop();
-          void voice.say(numberLine(k));
+          void voice.say(numberLine(k, level.lang), 'now');
         }, k * 750),
       );
     }
@@ -99,11 +102,11 @@ export default function CifreGame({ level, onItem, voice, hints, registerTest }:
     mistakes.current = 0;
     started.current = Date.now();
     hints.reset();
-    const d = pickDigit(skill, rand.current, digit);
+    const d = pickDigit(skill, rand.current, digit, max);
     setDigit(d);
     setAnimal(pick(rand.current, ANIMALS));
     setShown(mode === 'count' ? d : 0);
-    setOptions(digitOptions(d, max, rand.current));
+    setOptions(digitOptions(d, max, rand.current, choices));
     setPopped(null);
     setPhase(mode === 'count' ? 'choose' : 'meet');
   };
@@ -113,7 +116,7 @@ export default function CifreGame({ level, onItem, voice, hints, registerTest }:
     if (d === digit) {
       sfx.pop();
       setPopped(d);
-      void voice.say(numberLine(d));
+      void voice.say(numberLine(d, level.lang), 'now');
       void next();
       return;
     }
@@ -166,7 +169,7 @@ export default function CifreGame({ level, onItem, voice, hints, registerTest }:
           {options.map((d, i) => (
             <Balloon
               key={d}
-              label={`Cifra ${d}`}
+              label={t('cifre.digit', { x: d })}
               color={i + digit}
               onPress={() => choose(d)}
               state={popped === d ? 'popped' : wrong === d ? 'wrong' : 'idle'}

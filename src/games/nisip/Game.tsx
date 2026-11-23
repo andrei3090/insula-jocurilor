@@ -7,11 +7,13 @@ import { sfx } from '../../audio/sfx';
 import { useProgress } from '../../core/progress';
 import { randomSeed, rng } from '../../core/rng';
 import type { GameProps } from '../../core/types';
+import type { UiKey } from '../../i18n/ui';
+import { useT } from '../../i18n/ui';
 import { InkCanvas, type InkHandle, type Stroke } from '../../input/InkCanvas';
 import { DemoHand } from '../../ui/DemoHand';
 import type { LineId } from '../../voice/lines';
 import { type Pt, resample } from './geometry';
-import { DIGITS, type Glyph, glyphLabel, STROKES, UPPER } from './glyphs';
+import { DIGITS, type Glyph, glyphLabel, STROKES, UPPER, UPPER_EN } from './glyphs';
 import {
   checkpoints,
   matchGlyphStroke,
@@ -52,16 +54,24 @@ function Arrow({ pts, at }: { pts: Pt[]; at: number }) {
 }
 
 type Kind = 'strokes' | 'upper' | 'digits';
-const LISTS: Record<Kind, Glyph[]> = { strokes: STROKES, upper: UPPER, digits: DIGITS };
+/** What she may write at this level, in her language (English: A–Z without the Romanian letters). */
+function listFor(kind: Kind, level: GameProps['level']): Glyph[] {
+  const s = level.spec as { strokes?: number; letters?: number; digits?: number };
+  if (kind === 'strokes') return STROKES.slice(0, Math.max(3, s.strokes ?? 99));
+  if (kind === 'digits') return DIGITS.slice(0, Math.max(3, s.digits ?? 99));
+  const letters = level.lang === 'en' ? UPPER_EN : UPPER;
+  return letters.slice(0, Math.max(3, s.letters ?? 99));
+}
 
-const KINDS: { kind: Kind; label: string; sample: string; voice: LineId; color: string }[] = [
-  { kind: 'strokes', label: 'Linii și valuri', sample: '〰', voice: 'nisip.pick.strokes', color: '#4cc9c0' },
-  { kind: 'upper', label: 'Litere', sample: 'A', voice: 'nisip.pick.letters', color: '#7e63b8' },
-  { kind: 'digits', label: 'Cifre', sample: '1', voice: 'nisip.pick.digits', color: '#5aa83a' },
+const KINDS: { kind: Kind; label: UiKey; sample: string; voice: LineId; color: string }[] = [
+  { kind: 'strokes', label: 'nisip.strokes', sample: '〰', voice: 'nisip.pick.strokes', color: '#4cc9c0' },
+  { kind: 'upper', label: 'nisip.letters', sample: 'A', voice: 'nisip.pick.letters', color: '#7e63b8' },
+  { kind: 'digits', label: 'nisip.digits', sample: '1', voice: 'nisip.pick.digits', color: '#5aa83a' },
 ];
 
 /** The child chooses what to write: lines, letters or digits. The level only pre-selects the suggestion. */
 export default function NisipGame(props: GameProps) {
+  const t = useT();
   const suggested = (props.level.skill.split('.')[1] ?? 'strokes') as Kind;
   const [kind, setKind] = useState<Kind | null>(null);
   // biome-ignore lint/correctness/useExhaustiveDependencies: once
@@ -80,11 +90,11 @@ export default function NisipGame(props: GameProps) {
         <motion.button
           key={k.kind}
           type="button"
-          aria-label={k.label}
+          aria-label={t(k.label)}
           data-testid={`pick-${k.kind}`}
           onClick={() => {
             sfx.pop();
-            void props.voice.say(k.voice);
+            void props.voice.say(k.voice, 'now');
             setKind(k.kind);
           }}
           initial={{ scale: 0, y: 30 }}
@@ -95,7 +105,7 @@ export default function NisipGame(props: GameProps) {
           style={{ background: k.color }}
         >
           <span className="font-school text-[96px] leading-none font-bold text-white">{k.sample}</span>
-          <span className="text-xl font-semibold text-white">{k.label}</span>
+          <span className="text-xl font-semibold text-white">{t(k.label)}</span>
         </motion.button>
       ))}
     </div>
@@ -112,8 +122,9 @@ function Board({
   kind,
   onChangeKind,
 }: GameProps & { kind: Kind; onChangeKind(): void }) {
+  const t = useT();
   const skill = `trace.${kind}` as NisipSkill;
-  const list = LISTS[kind];
+  const list = useMemo(() => listFor(kind, level), [kind, level]);
   const rand = useRef(rng(randomSeed()));
   const [glyph, setGlyph] = useState<Glyph>(() => pickGlyph(list, boxesOf(profileId), rand.current));
   const [done, setDone] = useState<number[]>([]);
@@ -129,9 +140,12 @@ function Board({
   const age = level.age;
   const errorless = hints.rung >= 4;
   const tol = useMemo(() => {
-    const t = tolerancesForAge(age);
-    return errorless ? { r: t.r * 1.6, d: t.d * 1.6 } : t;
-  }, [age, errorless]);
+    // higher levels narrow the path a little (up to 25%); the errorless rung widens it again
+    const base = tolerancesForAge(age);
+    const k = (level.spec.tight as number | undefined) ?? 1;
+    const tl = { r: base.r * k, d: base.d * k };
+    return errorless ? { r: tl.r * 1.6, d: tl.d * 1.6 } : tl;
+  }, [age, errorless, level.spec.tight]);
   const follow = age < 6 || errorless;
 
   const pending = glyph.strokes.map((_, i) => i).filter((i) => !done.includes(i));
@@ -200,7 +214,7 @@ function Board({
     mistakes.current += 1;
     setMood('think');
     sfx.swish();
-    if (m.reason === 'start' && hints.rung === 0) void voice.say('nisip.start');
+    if (m.reason === 'start' && hints.rung === 0) void voice.say('nisip.start', 'now');
     hints.next();
   };
 
@@ -245,7 +259,7 @@ function Board({
       </div>
       <button
         type="button"
-        aria-label="Alege altceva de scris"
+        aria-label={t('nisip.other')}
         onClick={onChangeKind}
         className="absolute top-2 right-4 z-10 grid size-[84px] place-items-center rounded-full border-4 border-ink/70 bg-white/90 font-school text-3xl font-bold"
       >
@@ -341,7 +355,7 @@ function Board({
           size={Math.max(14, box * 0.045)}
           persist={false}
           disabled={washing}
-          label="Nisip pentru scris"
+          label={t('nisip.sand')}
           onStrokeMove={onStrokeMove}
           onStrokeEnd={onStrokeEnd}
         />

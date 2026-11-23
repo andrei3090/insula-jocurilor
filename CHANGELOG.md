@@ -1,5 +1,14 @@
 # Ce e nou
 
+## 0.7.0 (23.11.2026)
+
+- Toate vocile sunt acum naturale, nicio voce robotică. Am verificat fiecare replică ascultând-o, iar cele tăiate greșit (care spuneau și o bucată din replica următoare) sunt reparate.
+- O singură voce odată: personajele nu se mai întrerup între ele. O replică se termină înainte să înceapă următoarea; doar o atingere a copilului poate opri ce se spune.
+- Niveluri de la 1 la 50 în fiecare joc de învățat: copilul vede nivelul în colț, primește 1–3 stele la finalul rundei și trece la nivelul următor. Dacă o rundă a fost grea, mai joacă o dată nivelul; a doua oară trece oricum, ca să nu rămână blocat. Nivelurile deschise se pot alege din „drumul cu pietre”.
+- Engleză sau română: se alege pe ecranul de început (steagurile) sau în zona părinților, pentru fiecare copil. În engleză vorbesc toate personajele, iar alfabetul are literele și cuvintele englezești.
+- Progresul se salvează pe tabletă, cu o copie de siguranță. Pe ecranul de început, lacătul din colț (ține apăsat 3 secunde, apoi PIN-ul) deschide „Resetează tot” pentru copilul ales.
+- Zona părinților: nivelul fiecărui joc (îl poți coborî sau urca), „Deschide toate nivelurile”, limba copilului.
+
 ## 0.6.5 (23.11.2026)
 
 - Cifrele vii vorbesc acum în întregime cu vocea naturală. Xilofonul lui Bruno, Desenăm cu Pufi și Bruno, când îl atingi, au și ele mai multe replici cu vocea naturală. Mai rămân câteva replici pentru actualizarea următoare.

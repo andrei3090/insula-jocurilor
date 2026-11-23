@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 import type { GameManifest } from '../../core/types';
-import { BAR_COLORS, SKILLS } from './logic';
+import { BAR_COLORS, levelSpec, SKILLS } from './logic';
 
 const Icon = ({ size = 120 }: { size?: number }) =>
   createElement(
@@ -30,6 +30,7 @@ export const manifest: GameManifest = {
   skills: SKILLS,
   icon: Icon,
   load: () => import('./Game'),
+  levelSpec,
   roundSize: 4,
   promoteAfter: 3,
   startStep: (age) => (age <= 4 ? 0 : age <= 6 ? 1 : 3),

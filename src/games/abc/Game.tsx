@@ -7,10 +7,11 @@ import { sfx } from '../../audio/sfx';
 import { useProgress } from '../../core/progress';
 import { randomSeed, rng } from '../../core/rng';
 import type { GameProps } from '../../core/types';
+import { useT } from '../../i18n/ui';
 import { Balloon } from '../../ui/Balloon';
 import { GlyphCard } from '../../ui/GlyphCard';
 import type { LineId } from '../../voice/lines';
-import { LETTERS, type LetterItem, sayLetter } from './data';
+import { type LetterItem, lettersFor, sayLetter } from './data';
 import { type AbcSkill, catchOptions, pickLetter, soundable, soundOptions } from './logic';
 
 const boxesOf = (profileId: string) =>
@@ -24,15 +25,21 @@ const boxesOf = (profileId: string) =>
 type Phase = 'meet' | 'choose' | 'busy';
 
 export default function AbcGame({ level, onItem, voice, hints, registerTest, profileId }: GameProps) {
+  const t = useT();
   const skill = level.skill as AbcSkill;
-  const pool = skill === 'abc.sound' ? LETTERS.filter(soundable) : LETTERS;
+  // the letters of her language; the level decides how many are in play
+  const LETTERS = lettersFor(level.lang);
+  const count = Math.max(3, (level.spec.letters as number | undefined) ?? 99);
+  const pool = (skill === 'abc.sound' ? LETTERS.filter(soundable) : LETTERS).slice(0, count);
   const rand = useRef(rng(randomSeed()));
   const [letter, setLetter] = useState<LetterItem>(() =>
     pickLetter(boxesOf(profileId), rand.current, undefined, pool),
   );
   const [phase, setPhase] = useState<Phase>(skill === 'abc.sound' ? 'choose' : 'meet');
   const [options, setOptions] = useState<LetterItem[]>(() =>
-    skill === 'abc.sound' ? soundOptions(letter, rand.current) : catchOptions(letter, rand.current),
+    skill === 'abc.sound'
+      ? soundOptions(letter, rand.current, LETTERS)
+      : catchOptions(letter, rand.current, LETTERS),
   );
   const [wrong, setWrong] = useState<string | null>(null);
   const [popped, setPopped] = useState<string | null>(null);
@@ -62,7 +69,9 @@ export default function AbcGame({ level, onItem, voice, hints, registerTest, pro
     hints.reset();
     const l = pickLetter(boxesOf(profileId), rand.current, letter.id, pool);
     setLetter(l);
-    setOptions(skill === 'abc.sound' ? soundOptions(l, rand.current) : catchOptions(l, rand.current));
+    setOptions(
+      skill === 'abc.sound' ? soundOptions(l, rand.current, LETTERS) : catchOptions(l, rand.current, LETTERS),
+    );
     setPopped(null);
     setMood('idle');
     setPhase(skill === 'abc.sound' ? 'choose' : 'meet');
@@ -84,7 +93,7 @@ export default function AbcGame({ level, onItem, voice, hints, registerTest, pro
     if (o.id === letter.id) {
       sfx.pop();
       setPopped(o.id);
-      if (skill === 'abc.sound') void voice.say(sayLetter(letter));
+      if (skill === 'abc.sound') void voice.say(sayLetter(letter), 'now');
       void next();
       return;
     }
@@ -162,7 +171,7 @@ export default function AbcGame({ level, onItem, voice, hints, registerTest, pro
             ) : (
               <Balloon
                 key={o.id}
-                label={`Litera ${o.glyph}`}
+                label={t('abc.letter', { x: o.glyph })}
                 color={i + LETTERS.indexOf(letter)}
                 onPress={() => choose(o)}
                 state={popped === o.id ? 'popped' : wrong === o.id ? 'wrong' : 'idle'}

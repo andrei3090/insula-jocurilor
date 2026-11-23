@@ -16,7 +16,9 @@ wrapped-gift spiral-shell sailboat canoe desert-island gem-stone palm-tree water
 high-heeled-shoe ballet-shoes bowl-with-spoon chair bed teddy-bear honey-pot carrot castle magic-wand crystal-ball
 red-heart pink-heart artist-palette paintbrush crayon kite umbrella rocket anchor compass alarm-clock mantelpiece-clock
 coin money-bag ring bell drum seedling herb deciduous-tree evergreen-tree snowflake fire droplet house
-bread horse-face hippopotamus egg snake kiwi-fruit yo-yo zebra chicken`.split(/\s+/);
+bread horse-face hippopotamus egg snake kiwi-fruit yo-yo zebra chicken nest-with-eggs tiger-face violin`.split(
+    /\s+/,
+  );
 
 /** Icons for the parent app only (kept out of the child bundle). */
 export const PARENT_NAMES =

@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 import { Marina } from '../../art/Marina';
 import type { GameManifest } from '../../core/types';
-import { SKILLS } from './logic';
+import { levelSpec, SKILLS } from './logic';
 
 export const manifest: GameManifest = {
   id: 'nisip',
@@ -12,6 +12,7 @@ export const manifest: GameManifest = {
   skills: SKILLS,
   icon: ({ size = 120 }) => createElement(Marina, { size }),
   load: () => import('./Game'),
+  levelSpec,
   roundSize: 4,
   promoteAfter: 8,
   startStep: (age) => (age <= 5 ? 0 : 1),

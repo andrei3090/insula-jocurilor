@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 import { Cenusareasa } from '../../art/Cenusareasa';
 import type { GameManifest } from '../../core/types';
-import { SKILLS } from './logic';
+import { levelSpec, SKILLS } from './logic';
 
 export const manifest: GameManifest = {
   id: 'memorie',
@@ -12,6 +12,7 @@ export const manifest: GameManifest = {
   skills: SKILLS,
   icon: ({ size = 120 }) => createElement(Cenusareasa, { size }),
   load: () => import('./Game'),
+  levelSpec,
   roundSize: 3,
   promoteAfter: 2,
   startStep: (age) => (age <= 4 ? 0 : age <= 5 ? 1 : age <= 7 ? 2 : 3),

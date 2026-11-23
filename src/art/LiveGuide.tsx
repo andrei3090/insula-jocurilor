@@ -9,7 +9,7 @@ import type { Mood } from './parts';
 /**
  * A guide that comes alive when tapped: it hops, waves or dances (in turn), giggles, and on the island
  * screens also says a short line. `mood` is what the screen wants when nobody is tapping.
- * In games `speak` stays off, so a tap never talks over an instruction.
+ * In games `speak` stays off; on the islands the line is 'idle' speech, so it never talks over an instruction.
  */
 export function LiveGuide({
   who,
@@ -43,7 +43,7 @@ export function LiveGuide({
     sfx.giggle(GIGGLE_HZ[who]);
     if (speak && Date.now() - lastLine.current > LINE_EVERY_MS) {
       lastLine.current = Date.now();
-      void voice.say(tapLine(who, k));
+      void voice.say(tapLine(who, k), 'idle'); // decoration: never over an instruction
     }
     timer.current = setTimeout(() => {
       busy.current = false;

@@ -6,20 +6,22 @@ import { THINGS } from '../../art/things';
 import { sfx } from '../../audio/sfx';
 import { randomSeed, rng } from '../../core/rng';
 import type { GameProps } from '../../core/types';
+import { useT } from '../../i18n/ui';
 import { DemoHand } from '../../ui/DemoHand';
-import type { LineId } from '../../voice/lines';
+import { type LineId, textOf } from '../../voice/lines';
 import { isNextInOrder, makeItem, matchOk, type UrsiItem, type UrsiSkill } from './logic';
 
 const BEARS = [
-  { size: 2, px: 200, line: 'ursi.big' as LineId, label: 'Ursul cel mare' },
-  { size: 1, px: 160, line: 'ursi.mid' as LineId, label: 'Ursul mijlociu' },
-  { size: 0, px: 118, line: 'ursi.small' as LineId, label: 'Ursul cel mic' },
+  { size: 2, px: 200, line: 'ursi.big' as LineId },
+  { size: 1, px: 160, line: 'ursi.mid' as LineId },
+  { size: 0, px: 118, line: 'ursi.small' as LineId },
 ];
 const scaleFor = (size: number, n: number) => 0.5 + (0.5 * size) / Math.max(1, n - 1);
 const promptFor = (it: UrsiItem): LineId =>
   it.mode === 'order' ? 'ursi.order' : (`ursi.match.${it.thing}` as LineId);
 
 export default function UrsiGame({ level, onItem, voice, hints, registerTest }: GameProps) {
+  const t = useT();
   const skill = level.skill as UrsiSkill;
   const rand = useRef(rng(randomSeed()));
   const [item, setItem] = useState<UrsiItem>(() => makeItem(skill, rand.current));
@@ -92,7 +94,7 @@ export default function UrsiGame({ level, onItem, voice, hints, registerTest }: 
     sfx.pop();
     if (item.mode === 'match') {
       setMoods((m) => ({ ...m, [size]: 'happy' }));
-      void voice.say(BEARS.find((b) => b.size === size)!.line);
+      void voice.say(BEARS.find((b) => b.size === size)!.line, 'now');
     }
     if (next.length === n) void complete();
   };
@@ -164,7 +166,7 @@ export default function UrsiGame({ level, onItem, voice, hints, registerTest }: 
                 type="button"
                 data-size={size}
                 data-testid="thing"
-                aria-label="obiect"
+                aria-label={t('ursi.object')}
                 disabled={dim}
                 onClick={() => tapObject(size)}
                 drag
@@ -191,11 +193,11 @@ export default function UrsiGame({ level, onItem, voice, hints, registerTest }: 
                 key={b.size}
                 type="button"
                 data-bear={b.size}
-                aria-label={b.label}
+                aria-label={textOf(b.line, level.lang)}
                 onClick={() => tapBear(b.size)}
                 className={`relative flex flex-col items-center rounded-3xl p-2 ${hints.rung >= 2 && selected !== null && b.size === selected ? 'bg-sun/50' : ''}`}
               >
-                <Bruno size={b.px} mood={moods[b.size] ?? 'idle'} title={b.label} />
+                <Bruno size={b.px} mood={moods[b.size] ?? 'idle'} title={textOf(b.line, level.lang)} />
                 <div className="flex h-[90px] items-end">
                   {placed.includes(b.size) && (
                     <motion.div layoutId={`thing-${b.size}`}>

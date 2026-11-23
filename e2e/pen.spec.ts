@@ -198,6 +198,8 @@ for (const id of ['soare', 'peste', 'floare', 'panda', 'urs', 'testoasa', 'caste
   test(`guided drawing: ${id} can be finished by tracing its guides`, async ({ page }) => {
     await start(page);
     await openGame(page, 'atelier', 'ghidat');
+    // every drawing is open from level 13
+    await page.evaluate(() => window.__test?.level?.(14));
     await page.getByTestId(`drawing-${id}`).click();
     await page.locator('[data-testid=paper] [data-testid=ink-live]').waitFor();
     await page.waitForTimeout(400);

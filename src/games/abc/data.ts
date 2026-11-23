@@ -38,6 +38,38 @@ export const LETTERS: LetterItem[] = [
   { id: 'Y', glyph: 'Y', word: 'yo-yo', emoji: 'yo-yo' },
 ];
 
+/** English alphabet A–Z (the ABC song order), each with an English word and picture where there is a good one. */
+export const LETTERS_EN: LetterItem[] = [
+  { id: 'A', glyph: 'A', word: 'apple', emoji: 'red-apple' },
+  { id: 'B', glyph: 'B', word: 'balloon', emoji: 'balloon' },
+  { id: 'C', glyph: 'C', word: 'cat', emoji: 'cat-face' },
+  { id: 'D', glyph: 'D', word: 'dolphin', emoji: 'dolphin' },
+  { id: 'E', glyph: 'E', word: 'elephant', emoji: 'elephant' },
+  { id: 'F', glyph: 'F', word: 'fox', emoji: 'fox' },
+  { id: 'G', glyph: 'G', word: 'giraffe', emoji: 'giraffe' },
+  { id: 'H', glyph: 'H', word: 'horse', emoji: 'horse-face' },
+  { id: 'I', glyph: 'I', word: 'ice cream', emoji: 'soft-ice-cream' },
+  { id: 'J', glyph: 'J', word: 'jellyfish', emoji: 'jellyfish' },
+  { id: 'K', glyph: 'K', word: 'koala', emoji: 'koala' },
+  { id: 'L', glyph: 'L', word: 'lion', emoji: 'lion' },
+  { id: 'M', glyph: 'M', word: 'monkey', emoji: 'monkey-face' },
+  { id: 'N', glyph: 'N', word: 'nest', emoji: 'nest-with-eggs' },
+  { id: 'O', glyph: 'O', word: 'octopus', emoji: 'octopus' },
+  { id: 'P', glyph: 'P', word: 'panda', emoji: 'panda' },
+  { id: 'Q', glyph: 'Q' },
+  { id: 'R', glyph: 'R', word: 'rocket', emoji: 'rocket' },
+  { id: 'S', glyph: 'S', word: 'sun', emoji: 'sun' },
+  { id: 'T', glyph: 'T', word: 'tiger', emoji: 'tiger-face' },
+  { id: 'U', glyph: 'U', word: 'umbrella', emoji: 'umbrella' },
+  { id: 'V', glyph: 'V', word: 'violin', emoji: 'violin' },
+  { id: 'W', glyph: 'W', word: 'whale', emoji: 'spouting-whale' },
+  { id: 'X', glyph: 'X' },
+  { id: 'Y', glyph: 'Y', word: 'yo-yo', emoji: 'yo-yo' },
+  { id: 'Z', glyph: 'Z', word: 'zebra', emoji: 'zebra' },
+];
+
+export const lettersFor = (lang: 'ro' | 'en') => (lang === 'en' ? LETTERS_EN : LETTERS);
+
 export const sayLetter = (l: LetterItem): LineId =>
   l.word ? (`abc.word.${l.id}` as LineId) : (`letter.${l.id}` as LineId);
 

@@ -1,4 +1,5 @@
 import type { EmojiName } from '../../art/Emoji';
+import { band, type LevelSpec, within } from '../../core/levels';
 import type { Avatar } from '../../core/profile';
 import { int, type Rand, sample, shuffle } from '../../core/rng';
 
@@ -41,10 +42,14 @@ const BALL: EmojiName[] = [
   'teddy-bear',
 ];
 
-export function makeDeck(skill: MemSkill, r: Rand): MemCard[] {
+export function makeDeck(skill: MemSkill, r: Rand, numbers?: number): MemCard[] {
   const [c, rows] = GRID[skill];
   const pairs = (c * rows) / 2;
-  const numberPairs = skill === 'mem.3x4' ? 3 : skill === 'mem.4x4' ? 4 : 0;
+  const numberPairs = Math.min(
+    6,
+    pairs - 1,
+    numbers ?? (skill === 'mem.3x4' ? 3 : skill === 'mem.4x4' ? 4 : 0),
+  );
   const picturePairs = pairs - numberPairs;
   const guideCount = Math.min(GUIDES.length, int(r, 1, Math.max(1, Math.floor(picturePairs / 2))));
   const faces: { pair: string; a: Face; b: Face }[] = [
@@ -90,3 +95,13 @@ export function flip(s: MemState, uid: number, deck: readonly MemCard[]): [MemSt
 export const close = (s: MemState): MemState => ({ ...s, open: [], locked: false });
 
 export const solved = (s: MemState, deck: readonly MemCard[]) => s.matched.length * 2 === deck.length;
+
+/** Levels 1…50: 2×2 → 3×2 → 4×3 → 4×4, with more picture–number pairs as she grows. */
+const BANDS = [6, 8, 10, 12, 14] as const;
+const BAND_SKILL: readonly MemSkill[] = ['mem.2x2', 'mem.2x3', 'mem.3x4', 'mem.4x4', 'mem.4x4'];
+export function levelSpec(n: number): LevelSpec & { skill: MemSkill; numbers: number } {
+  const b = band(n, BANDS);
+  const w = within(n, BANDS);
+  const numbers = [0, 0, Math.round(3 * w), 2 + Math.round(2 * w), 4 + Math.round(2 * w)][b];
+  return { skill: BAND_SKILL[b], numbers };
+}

@@ -5,11 +5,12 @@ import type { Mood } from '../../art/parts';
 import { sfx } from '../../audio/sfx';
 import { saveDrawing } from '../../core/drawings';
 import type { GameProps } from '../../core/types';
+import { useT } from '../../i18n/ui';
 import { InkCanvas, type InkHandle, type Stroke } from '../../input/InkCanvas';
 import { BigButton } from '../../ui/BigButton';
 import { StarBurst } from '../../ui/Celebration';
 import { DemoHand } from '../../ui/DemoHand';
-import { CheckIcon } from '../../ui/icons';
+import { CheckIcon, LockIcon } from '../../ui/icons';
 import { POTS } from '../desen/logic';
 import type { Pt } from '../nisip/geometry';
 import { DRAWINGS, type Drawing, regionsOf } from './drawings';
@@ -37,10 +38,25 @@ const POT = 70;
 
 type Fill = { x: number; y: number; color: string };
 
-/** Pick a drawing, trace it step by step with Pufi, then colour it inside her own lines. */
+const NAMES_EN: Record<string, string> = {
+  soare: 'The sun',
+  peste: 'The little fish',
+  floare: 'The flower',
+  panda: 'Pufi',
+  urs: 'The little bear',
+  testoasa: 'The turtle',
+  castel: 'The castle',
+};
+
+/**
+ * Pick a drawing, trace it step by step with Pufi, then colour it inside her own lines. The level opens one
+ * more drawing every second level (simplest first); the others wait with a lock.
+ */
 export default function GhidatGame(props: GameProps) {
+  const t = useT();
   const [drawing, setDrawing] = useState<Drawing | null>(null);
   const [autoSolve, setAutoSolve] = useState(false);
+  const open = Math.max(1, (props.level.spec.open as number | undefined) ?? DRAWINGS.length);
   // biome-ignore lint/correctness/useExhaustiveDependencies: once
   useEffect(() => {
     void props.voice.prompt('ghidat.choose');
@@ -58,25 +74,45 @@ export default function GhidatGame(props: GameProps) {
       className="flex h-full flex-wrap content-center items-center justify-center gap-5 px-6 pb-6"
       data-testid="drawings"
     >
-      {DRAWINGS.map((d, i) => (
-        <motion.button
-          key={d.id}
-          type="button"
-          aria-label={d.label}
-          data-testid={`drawing-${d.id}`}
-          onClick={() => {
-            sfx.pop();
-            setDrawing(d);
-          }}
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: i * 0.05, type: 'spring' }}
-          whileTap={{ scale: 0.9 }}
-          className="grid size-[176px] place-items-center rounded-[2.2rem] border-4 border-ink/70 bg-white shadow-[0_6px_0_rgba(59,42,74,0.3)]"
-        >
-          <DrawingModel drawing={d} size={150} />
-        </motion.button>
-      ))}
+      {DRAWINGS.map((d, i) => {
+        const locked = i >= open;
+        return (
+          <motion.button
+            key={d.id}
+            type="button"
+            aria-label={
+              locked ? t('ghidat.locked') : props.level.lang === 'en' ? (NAMES_EN[d.id] ?? d.label) : d.label
+            }
+            data-testid={`drawing-${d.id}`}
+            data-locked={locked}
+            onClick={() => {
+              if (locked) {
+                sfx.boop();
+                void props.voice.say('level.locked', 'now');
+                return;
+              }
+              sfx.pop();
+              setDrawing(d);
+            }}
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: i * 0.05, type: 'spring' }}
+            whileTap={{ scale: 0.9 }}
+            className={`relative grid size-[176px] place-items-center rounded-[2.2rem] border-4 shadow-[0_6px_0_rgba(59,42,74,0.3)] ${
+              locked ? 'border-ink/20 bg-[#ebe6f0]' : 'border-ink/70 bg-white'
+            }`}
+          >
+            <span className={locked ? 'opacity-25 grayscale' : ''}>
+              <DrawingModel drawing={d} size={150} />
+            </span>
+            {locked && (
+              <span className="absolute inset-0 grid place-items-center">
+                <LockIcon size={56} />
+              </span>
+            )}
+          </motion.button>
+        );
+      })}
     </div>
   );
 }
@@ -181,6 +217,7 @@ function Board({
   drawing,
   autoSolve,
 }: GameProps & { drawing: Drawing; autoSolve: boolean }) {
+  const t = useT();
   const steps = drawing.steps;
   const regions = useMemo(() => regionsOf(drawing), [drawing]);
   const [stepIdx, setStepIdx] = useState(0);
@@ -211,7 +248,8 @@ function Board({
   const age = level.age;
   const errorless = hints.rung >= 4;
   const tol = useMemo(() => tolFor(age, errorless), [age, errorless]);
-  const need = coverageNeed(age);
+  // the level asks for a fuller line; never less than her age needs
+  const need = Math.max(coverageNeed(age), (level.spec.need as number | undefined) ?? 0);
   const step = steps[stepIdx];
 
   // the paper keeps its size once she has drawn (her strokes are in pixels)
@@ -273,7 +311,7 @@ function Board({
       sfx.swish();
       if (!offguideSaid.current) {
         offguideSaid.current = true;
-        void voice.say('ghidat.offguide');
+        void voice.say('ghidat.offguide', 'now');
       }
       hints.next();
       return;
@@ -442,7 +480,7 @@ function Board({
             color={INK}
             size={Math.max(7, box * 0.016)}
             disabled={phase !== 'draw'}
-            label="Foaie pentru desenat cu Pufi"
+            label={t('ghidat.paper')}
             onStrokeEnd={onStrokeEnd}
           />
         )}
@@ -473,7 +511,7 @@ function Board({
               aria-label={p.id}
               onClick={() => {
                 setColor(p.color);
-                void voice.say(p.voice);
+                void voice.say(p.voice, 'now');
               }}
               whileTap={{ scale: 0.85 }}
               animate={{ scale: color === p.color ? 1.12 : 1 }}
@@ -483,7 +521,7 @@ function Board({
           ))}
         </div>
         <div className="flex gap-4 portrait:flex-col">
-          <BigButton label="Înapoi un pas" size={88} round onPress={undo} disabled={!fillCount} testId="undo">
+          <BigButton label={t('undo')} size={88} round onPress={undo} disabled={!fillCount} testId="undo">
             <svg viewBox="0 0 64 64" width={44} height={44} aria-hidden="true">
               <path
                 d="M24 18 L12 30 L24 42"
@@ -503,7 +541,7 @@ function Board({
             </svg>
           </BigButton>
           <BigButton
-            label="Gata, pune în album"
+            label={t('ghidat.done')}
             size={88}
             round
             tone="lagoon"

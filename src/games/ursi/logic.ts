@@ -1,3 +1,4 @@
+import { band, type LevelSpec } from '../../core/levels';
 import { pick, type Rand, shuffle } from '../../core/rng';
 
 export const SKILLS = ['size.match3', 'size.order3', 'size.order4', 'size.order5'] as const;
@@ -30,3 +31,7 @@ export const matchOk = (objectSize: number, bearSize: number) => objectSize === 
 /** In order mode the child picks the smallest object still left. */
 export const isNextInOrder = (sizes: readonly number[], placed: readonly number[], size: number) =>
   size === Math.min(...sizes.filter((s) => !placed.includes(s)));
+
+/** Levels 1…50: give each bear its own → order 3 → order 4 → order 5. */
+const BANDS = [10, 12, 14, 14] as const;
+export const levelSpec = (n: number): LevelSpec & { skill: UrsiSkill } => ({ skill: SKILLS[band(n, BANDS)] });

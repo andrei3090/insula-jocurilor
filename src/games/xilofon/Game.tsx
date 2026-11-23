@@ -6,6 +6,7 @@ import { playNote } from '../../audio/notes';
 import { sfx } from '../../audio/sfx';
 import { pick, randomSeed, rng } from '../../core/rng';
 import type { GameProps } from '../../core/types';
+import { useT } from '../../i18n/ui';
 import { DemoHand } from '../../ui/DemoHand';
 import type { LineId } from '../../voice/lines';
 import { BAR_COLORS, check, lengthOf, makeSequence, SONGS, type SongId, type XiloSkill } from './logic';
@@ -14,12 +15,14 @@ type Phase = 'listen' | 'play' | 'busy';
 const STEP_MS = 650;
 
 export default function XilofonGame({ level, onItem, voice, hints, registerTest }: GameProps) {
+  const t = useT();
   const skill = level.skill as XiloSkill;
-  const song = skill === 'xilo.song';
+  const song = (level.spec.song as boolean | undefined) ?? skill === 'xilo.song';
+  const length = (level.spec.length as number | undefined) ?? lengthOf(skill);
   const rand = useRef(rng(randomSeed()));
   const [songId, setSongId] = useState<SongId>(() => pick(rand.current, Object.keys(SONGS) as SongId[]));
   const [seq, setSeq] = useState<number[]>(() =>
-    song ? [...SONGS[songId]] : makeSequence(lengthOf(skill), rand.current),
+    song ? [...SONGS[songId]] : makeSequence(length, rand.current),
   );
   const [pos, setPos] = useState(0);
   const [phase, setPhase] = useState<Phase>(song ? 'play' : 'listen');
@@ -96,7 +99,7 @@ export default function XilofonGame({ level, onItem, voice, hints, registerTest 
       const id = (Object.keys(SONGS) as SongId[]).find((k) => k !== songId) ?? songId;
       setSongId(id);
       setSeq([...SONGS[id]]);
-    } else setSeq(makeSequence(lengthOf(skill), rand.current));
+    } else setSeq(makeSequence(length, rand.current));
   };
 
   const tap = (bar: number) => {
@@ -169,7 +172,7 @@ export default function XilofonGame({ level, onItem, voice, hints, registerTest 
           <motion.button
             key={c}
             type="button"
-            aria-label={`Bara ${i + 1}`}
+            aria-label={t('xilo.bar', { x: i + 1 })}
             data-testid={`bar-${i}`}
             onPointerDown={(e) => {
               e.preventDefault();

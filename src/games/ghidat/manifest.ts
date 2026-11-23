@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 import { Pufi } from '../../art/Pufi';
 import type { GameManifest } from '../../core/types';
-import { SKILLS } from './logic';
+import { levelSpec, SKILLS } from './logic';
 
 export const manifest: GameManifest = {
   id: 'ghidat',
@@ -12,6 +12,7 @@ export const manifest: GameManifest = {
   skills: SKILLS,
   icon: ({ size = 120 }) => createElement(Pufi, { size }),
   load: () => import('./Game'),
+  levelSpec,
   // one finished drawing is one round: a sticker for every drawing
   roundSize: 1,
 };

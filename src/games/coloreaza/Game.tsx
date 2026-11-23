@@ -6,6 +6,7 @@ import { sfx } from '../../audio/sfx';
 import { saveDrawing } from '../../core/drawings';
 import type { Avatar } from '../../core/profile';
 import type { GameProps, IslandId } from '../../core/types';
+import { useT } from '../../i18n/ui';
 import { BigButton } from '../../ui/BigButton';
 import { StarBurst } from '../../ui/Celebration';
 import { CheckIcon } from '../../ui/icons';
@@ -56,6 +57,7 @@ function prepare(root: HTMLElement): number {
 }
 
 export default function ColoreazaGame({ voice, registerTest, profileId }: GameProps) {
+  const t = useT();
   const [page, setPage] = useState<Page | null>(null);
   const [color, setColor] = useState(PALETTE[0].color);
   const [history, setHistory] = useState<Fill[]>([]);
@@ -142,7 +144,7 @@ export default function ColoreazaGame({ voice, registerTest, profileId }: GamePr
     await saveDrawing(profileId, blob);
     sfx.success();
     setSaved((n) => n + 1);
-    void voice.say('desen.saved');
+    void voice.say('desen.saved', 'now');
   };
 
   registerTest({
@@ -165,7 +167,7 @@ export default function ColoreazaGame({ voice, registerTest, profileId }: GamePr
           <motion.button
             key={p.id}
             type="button"
-            aria-label={`Desen de colorat ${p.id}`}
+            aria-label={t('coloreaza.page', { x: p.id })}
             data-testid="page"
             onClick={() => {
               sfx.pop();
@@ -193,7 +195,7 @@ export default function ColoreazaGame({ voice, registerTest, profileId }: GamePr
             aria-label={p.id}
             onClick={() => {
               setColor(p.color);
-              void voice.say(p.voice);
+              void voice.say(p.voice, 'now');
             }}
             whileTap={{ scale: 0.85 }}
             animate={{ scale: color === p.color ? 1.12 : 1 }}
@@ -213,7 +215,7 @@ export default function ColoreazaGame({ voice, registerTest, profileId }: GamePr
         {saved > 0 && <StarBurst key={saved} />}
       </div>
       <div className="flex flex-col gap-3 portrait:flex-row">
-        <BigButton label="Alt desen" size={86} round onPress={() => setPage(null)}>
+        <BigButton label={t('coloreaza.other')} size={86} round onPress={() => setPage(null)}>
           <svg viewBox="0 0 64 64" width={46} height={46} aria-hidden="true">
             <rect
               x={10}
@@ -257,7 +259,7 @@ export default function ColoreazaGame({ voice, registerTest, profileId }: GamePr
             />
           </svg>
         </BigButton>
-        <BigButton label="Înapoi un pas" size={86} round onPress={undo} disabled={!history.length}>
+        <BigButton label={t('undo')} size={86} round onPress={undo} disabled={!history.length}>
           <svg viewBox="0 0 64 64" width={44} height={44} aria-hidden="true">
             <path
               d="M24 18 L12 30 L24 42"
@@ -277,7 +279,7 @@ export default function ColoreazaGame({ voice, registerTest, profileId }: GamePr
           </svg>
         </BigButton>
         <BigButton
-          label="Pune în album"
+          label={t('toAlbum')}
           size={86}
           round
           tone="lagoon"

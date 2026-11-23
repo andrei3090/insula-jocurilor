@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { idbStorage } from './storage';
+import type { Lang } from '../i18n/lang';
+import { mirroredStorage } from './storage';
 
 export type Avatar = 'pufi' | 'bruno' | 'cenusareasa' | 'marina' | 'tavi';
-export type Profile = { id: string; name: string; age: number; avatar: Avatar };
+export type Profile = { id: string; name: string; age: number; avatar: Avatar; lang?: Lang };
 
 type ProfileState = {
   profiles: Profile[];
@@ -55,7 +56,7 @@ export const useProfile = create<ProfileState>()(
     }),
     {
       name: 'insula.profile.v1',
-      storage: idbStorage,
+      storage: mirroredStorage,
       partialize: ({ profiles, activeId, pin, pinChanged, sessionLimitMin, volume, voiceOn }) => ({
         profiles,
         activeId,

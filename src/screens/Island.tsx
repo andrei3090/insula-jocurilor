@@ -6,12 +6,14 @@ import { LiveGuide } from '../art/LiveGuide';
 import { sfx } from '../audio/sfx';
 import { voice } from '../audio/voice';
 import { useProfile } from '../core/profile';
+import { useProgress } from '../core/progress';
 import { gamesFor } from '../core/registry';
 import { useRouter } from '../core/router';
 import type { IslandId } from '../core/types';
+import { type UiKey, useLang, useT } from '../i18n/ui';
 import { BigButton } from '../ui/BigButton';
-import { HouseIcon } from '../ui/icons';
-import type { LineId } from '../voice/lines';
+import { HouseIcon, StarIcon } from '../ui/icons';
+import { type LineId, textOf } from '../voice/lines';
 
 const SCENE = 470;
 
@@ -20,9 +22,16 @@ export function Island({ island }: { island: IslandId }) {
   const age = useProfile((s) => s.active().age);
   const info = ISLANDS[island];
   const list = gamesFor(island, age);
+  const t = useT();
+  const lang = useLang();
+  const pid = useProfile((s) => s.activeId);
+  const lv = useProgress((s) => s.lv[pid]);
+  const levelOf = (id: string) => lv?.[id]?.current ?? 1;
 
   useEffect(() => {
     void voice.say(list.length ? (`island.${island}` as LineId) : 'island.soon');
+    // leaving this screen is her own choice: what it was saying is over
+    return () => voice.stop();
   }, [island, list.length]);
 
   return (
@@ -32,10 +41,17 @@ export function Island({ island }: { island: IslandId }) {
       data-testid={`island-screen-${island}`}
     >
       <header className="absolute left-6 top-5 z-10 flex items-center gap-4">
-        <BigButton label="Harta" tone="sun" size={88} round onPress={() => go({ name: 'map' })} testId="home">
+        <BigButton
+          label={t('map')}
+          tone="sun"
+          size={88}
+          round
+          onPress={() => go({ name: 'map' })}
+          testId="home"
+        >
           <HouseIcon size={50} />
         </BigButton>
-        <h1 className="text-4xl font-semibold">{info.name}</h1>
+        <h1 className="text-4xl font-semibold">{t(`island.${island}` as UiKey)}</h1>
       </header>
       <div className="flex h-full items-center gap-6 px-8 pt-24 portrait:flex-col portrait:justify-center">
         {/* the guides stand on their own island; a tap makes them hop, wave or dance and say hello */}
@@ -58,7 +74,7 @@ export function Island({ island }: { island: IslandId }) {
               key={g.id}
               type="button"
               data-testid={`card-${g.id}`}
-              aria-label={g.title}
+              aria-label={textOf(g.titleVoice, lang)}
               onClick={() => {
                 sfx.pop();
                 go({ name: 'game', id: g.id, island });
@@ -67,13 +83,24 @@ export function Island({ island }: { island: IslandId }) {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.1 + i * 0.08, type: 'spring', stiffness: 260, damping: 18 }}
               whileTap={{ scale: 0.92 }}
-              className="flex h-[210px] w-[200px] flex-col items-center justify-center gap-2 rounded-[2.2rem] border-4 border-ink/80 bg-white shadow-[0_8px_0_rgba(59,42,74,0.3)]"
+              className="relative flex h-[210px] w-[200px] flex-col items-center justify-center gap-2 rounded-[2.2rem] border-4 border-ink/80 bg-white shadow-[0_8px_0_rgba(59,42,74,0.3)]"
             >
               <g.icon size={130} />
-              <span className="px-2 text-center text-lg font-semibold leading-tight">{g.title}</span>
+              <span className="px-2 text-center text-lg font-semibold leading-tight">
+                {textOf(g.titleVoice, lang)}
+              </span>
+              {g.levelSpec && (
+                <span
+                  className="absolute -top-3 -right-3 flex items-center gap-0.5 rounded-full border-4 border-ink/80 bg-sun px-2 py-0.5 text-xl font-bold"
+                  data-testid={`card-level-${g.id}`}
+                >
+                  <StarIcon size={22} color="#ff7b29" />
+                  {levelOf(g.id)}
+                </span>
+              )}
             </motion.button>
           ))}
-          {!list.length && <p className="text-2xl text-ink/60">Aici vin jocuri noi în curând!</p>}
+          {!list.length && <p className="text-2xl text-ink/60">{t('island.soon')}</p>}
         </div>
       </div>
     </div>

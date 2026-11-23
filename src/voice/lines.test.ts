@@ -2,8 +2,8 @@ import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { lines } from './lines';
-import { clipKey, speakerFor } from './speakers';
+import { lines, linesEn } from './lines';
+import { clipKey, clipKeyEn, speakerFor } from './speakers';
 
 const hash = (id: string, text: string, e: 'ioana' | 'gemini') =>
   createHash('sha1')
@@ -31,13 +31,20 @@ describe('character voices', () => {
 });
 
 describe('voice clips', () => {
-  it('every LineId has a clip (Gemini, or the Ioana placeholder) matching its current text', () => {
+  it('every Romanian line has a natural (Gemini) clip matching its current text: no robotic voice left', () => {
     const stale = Object.entries(lines)
       .filter(
-        ([id, text]) =>
-          ![hash(id, text, 'gemini'), hash(id, text, 'ioana')].includes(manifest[id]) ||
-          !existsSync(`public/audio/${id}.m4a`),
+        ([id, text]) => manifest[id] !== hash(id, text, 'gemini') || !existsSync(`public/audio/${id}.m4a`),
       )
+      .map(([id]) => id);
+    expect(stale).toEqual([]);
+  });
+
+  it('every English line has a natural (Kokoro) clip matching its current text', () => {
+    const en: Record<string, string> = JSON.parse(readFileSync('public/audio/en/manifest.json', 'utf8'));
+    const h = (s: string) => createHash('sha1').update(s).digest('hex').slice(0, 12);
+    const stale = Object.entries(linesEn)
+      .filter(([id, text]) => en[id] !== h(clipKeyEn(id, text)) || !existsSync(`public/audio/en/${id}.m4a`))
       .map(([id]) => id);
     expect(stale).toEqual([]);
   });

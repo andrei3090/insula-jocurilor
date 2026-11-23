@@ -202,4 +202,9 @@ export const DIGITS: Glyph[] = [
 ];
 
 export const LABEL: Record<string, string> = { A2: 'Ă', A3: 'Â', I2: 'Î', S2: 'Ș', T2: 'Ț' };
+
+/** English: the same capitals without the Romanian ones, in alphabetical order (the ABC song order). */
+export const UPPER_EN: Glyph[] = UPPER.filter((g) => !(g.id in LABEL)).sort((a, b) =>
+  a.id.localeCompare(b.id),
+);
 export const glyphLabel = (g: Glyph) => (g.kind === 'upper' ? (LABEL[g.id] ?? g.id) : g.label);

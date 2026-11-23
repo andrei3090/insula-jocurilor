@@ -1,3 +1,4 @@
+import { band, type LevelSpec, within } from '../../core/levels';
 import { int, type Rand, shuffle } from '../../core/rng';
 
 export const SKILLS = ['count.3', 'count.5', 'digit.5', 'count.10', 'digit.10', 'add.10'] as const;
@@ -26,8 +27,13 @@ const RANGES: Record<PandaSkill, [number, number]> = {
   'add.10': [2, 10],
 };
 
-export function makeItem(skill: PandaSkill, r: Rand, prevTarget?: number): PandaItem {
-  const [lo, hi] = RANGES[skill];
+export function makeItem(
+  skill: PandaSkill,
+  r: Rand,
+  prevTarget?: number,
+  range: readonly [number, number] = RANGES[skill],
+): PandaItem {
+  const [lo, hi] = range;
   let target = int(r, lo, hi);
   for (let i = 0; i < 10 && target === prevTarget; i++) target = int(r, lo, hi);
   if (skill === 'add.10') {
@@ -56,3 +62,29 @@ export const check = (it: PandaItem, placed: number): 'ok' | 'few' | 'many' => {
   const n = need(it);
   return placed === n ? 'ok' : placed < n ? 'few' : 'many';
 };
+
+/** Levels 1…50: count to 3 → to 5 → read a digit to 5 → count to 10 → digit to 10 → add within 10. */
+const BANDS = [5, 5, 5, 8, 9, 9, 9] as const;
+const BAND_SKILL: readonly PandaSkill[] = [
+  'count.3',
+  'count.5',
+  'digit.5',
+  'count.10',
+  'digit.10',
+  'add.10',
+  'add.10',
+];
+export function levelSpec(n: number): LevelSpec & { skill: PandaSkill; range: [number, number] } {
+  const b = band(n, BANDS);
+  const w = within(n, BANDS);
+  const range: [number, number] = [
+    [1, 3],
+    [2, 5],
+    [1, 5],
+    [4, 6 + Math.round(4 * w)],
+    [3, 7 + Math.round(3 * w)],
+    [3, 6 + Math.round(2 * w)],
+    [5, 10],
+  ][b] as [number, number];
+  return { skill: BAND_SKILL[b], range };
+}

@@ -3,10 +3,12 @@ import { useEffect } from 'react';
 import { LiveGuide } from '../art/LiveGuide';
 import { voice } from '../audio/voice';
 import { useSession } from '../core/session';
+import { useT } from '../i18n/ui';
 import { LockButton } from '../ui/ParentGate';
 
 /** Calm "time for a break" screen after the parent-set limit. No guilt, no pleading. */
 export function BreakScreen({ onParentDismiss }: { onParentDismiss(): void }) {
+  const t = useT();
   useEffect(() => {
     void voice.say('break.time');
   }, []);
@@ -19,7 +21,7 @@ export function BreakScreen({ onParentDismiss }: { onParentDismiss(): void }) {
     >
       <div className="flex flex-col items-center gap-4">
         <LiveGuide who="pufi" size={260} mood="wave" />
-        <p className="text-4xl font-semibold">Pauză!</p>
+        <p className="text-4xl font-semibold">{t('break.title')}</p>
         <p className="max-w-md text-center text-xl text-ink/70">
           Ne-am jucat frumos. Mișcă-te puțin și bea un pahar cu apă.
         </p>

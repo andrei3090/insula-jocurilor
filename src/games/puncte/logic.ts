@@ -1,4 +1,5 @@
 import type { EmojiName } from '../../art/Emoji';
+import { band, type LevelSpec } from '../../core/levels';
 import { pick, type Rand } from '../../core/rng';
 
 export const SKILLS = ['dots.5', 'dots.10', 'dots.15'] as const;
@@ -220,3 +221,7 @@ export function reach(
   if (i === s.next - 1 || i < 0) return { state: s, event: 'same' };
   return { state: s, event: 'wrong' };
 }
+
+/** Levels 1…50: pictures of 5 dots → 10 → 15. */
+const BANDS = [16, 17, 17] as const;
+export const levelSpec = (n: number): LevelSpec & { skill: DotsSkill } => ({ skill: SKILLS[band(n, BANDS)] });

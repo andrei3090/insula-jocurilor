@@ -1,3 +1,4 @@
+import type { LevelSpec } from '../../core/levels';
 import { dist, distToPath, type Pt, pathLength, resample } from './geometry';
 import type { Glyph } from './glyphs';
 
@@ -91,4 +92,25 @@ export function pickGlyph(
   if (reviews.length && rand() < 0.3) return reviews[Math.floor(rand() * reviews.length)];
   const window = list.slice(f, f + 2).filter((g) => g.id !== prevId);
   return window[Math.floor(rand() * window.length)] ?? list[f];
+}
+
+/**
+ * Levels 1…50. She still chooses lines, letters or digits; the level suggests one (lines 1–10, letters 11–40,
+ * digits 41–50), opens more of each kind as she climbs, and narrows the path a little (up to 25%).
+ */
+export function levelSpec(n: number): LevelSpec & {
+  skill: NisipSkill;
+  strokes: number;
+  letters: number;
+  digits: number;
+  tight: number;
+} {
+  const skill: NisipSkill = n <= 10 ? 'trace.strokes' : n <= 40 ? 'trace.upper' : 'trace.digits';
+  return {
+    skill,
+    strokes: Math.min(99, 2 + n),
+    letters: Math.min(99, Math.max(3, n - 7)),
+    digits: Math.min(10, Math.max(3, n - 38)),
+    tight: 1 - 0.25 * ((n - 1) / 49),
+  };
 }

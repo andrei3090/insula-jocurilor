@@ -1,3 +1,4 @@
+import type { LevelSpec } from '../../core/levels';
 import { int, type Rand } from '../../core/rng';
 
 export const SKILLS = ['xilo.repeat2', 'xilo.repeat3', 'xilo.song', 'xilo.repeat4', 'xilo.repeat5'] as const;
@@ -40,4 +41,12 @@ export function makeSequence(n: number, r: Rand): number[] {
 export function check(seq: readonly number[], pos: number, bar: number): 'next' | 'done' | 'wrong' {
   if (seq[pos] !== bar) return 'wrong';
   return pos + 1 >= seq.length ? 'done' : 'next';
+}
+
+/** Levels 1…50: repeat 2 notes → 7 notes (8 levels each); every 10th level is a song. */
+export function levelSpec(n: number): LevelSpec & { skill: XiloSkill; length: number; song: boolean } {
+  const song = n % 10 === 0;
+  const length = Math.min(7, 2 + Math.floor((n - 1) / 8));
+  const skill = song ? 'xilo.song' : (`xilo.repeat${Math.min(5, Math.max(2, length))}` as XiloSkill);
+  return { skill, length, song };
 }

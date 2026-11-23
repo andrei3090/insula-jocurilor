@@ -6,10 +6,12 @@ import { sfx } from '../../audio/sfx';
 import { saveDrawing } from '../../core/drawings';
 import type { Avatar } from '../../core/profile';
 import type { GameProps } from '../../core/types';
+import { useT } from '../../i18n/ui';
 import { InkCanvas, type InkHandle, type InkTool } from '../../input/InkCanvas';
 import { BigButton } from '../../ui/BigButton';
 import { StarBurst } from '../../ui/Celebration';
 import { CheckIcon, TrashIcon } from '../../ui/icons';
+import { textOf } from '../../voice/lines';
 import { POTS, SIZES, stampAt } from './logic';
 
 const STAMP_EMOJI: EmojiName[] = [
@@ -74,7 +76,8 @@ function UndoIcon() {
   );
 }
 
-export default function DesenGame({ voice, registerTest, profileId }: GameProps) {
+export default function DesenGame({ level, voice, registerTest, profileId }: GameProps) {
+  const t = useT();
   const ink = useRef<InkHandle>(null);
   const tray = useRef<HTMLDivElement>(null);
   const [tool, setTool] = useState<InkTool>('pen');
@@ -100,7 +103,7 @@ export default function DesenGame({ voice, registerTest, profileId }: GameProps)
     setTool('pen');
     setColor(c);
     setStamp(null);
-    void voice.say(v);
+    void voice.say(v, 'now');
   };
 
   const save = async () => {
@@ -109,7 +112,7 @@ export default function DesenGame({ voice, registerTest, profileId }: GameProps)
     await saveDrawing(profileId, blob);
     sfx.success();
     setSaved((n) => n + 1);
-    void voice.say('desen.saved');
+    void voice.say('desen.saved', 'now');
   };
 
   registerTest({ solve: () => void save(), fail: () => {} });
@@ -126,7 +129,7 @@ export default function DesenGame({ voice, registerTest, profileId }: GameProps)
             tool={tool}
             color={color}
             size={size}
-            label="Foaia de desen"
+            label={t('desen.paper')}
             onTap={
               stamp
                 ? (x, y) => {
@@ -156,11 +159,11 @@ export default function DesenGame({ voice, registerTest, profileId }: GameProps)
           ))}
           <motion.button
             type="button"
-            aria-label="Curcubeu"
+            aria-label={textOf('color.rainbow', level.lang)}
             onClick={() => {
               setTool('rainbow');
               setStamp(null);
-              void voice.say('color.rainbow');
+              void voice.say('color.rainbow', 'now');
             }}
             animate={{ y: tool === 'rainbow' && !stamp ? -10 : 0 }}
             className="grid size-[68px] shrink-0 place-items-center rounded-full border-4 border-ink/70 bg-white"
@@ -169,7 +172,7 @@ export default function DesenGame({ voice, registerTest, profileId }: GameProps)
           </motion.button>
           <motion.button
             type="button"
-            aria-label="Radieră"
+            aria-label={t('desen.eraser')}
             onClick={() => {
               setTool('eraser');
               setStamp(null);
@@ -185,7 +188,7 @@ export default function DesenGame({ voice, registerTest, profileId }: GameProps)
       {/* tools */}
       <div className="flex w-[96px] flex-col items-center justify-end gap-2 pb-1">
         <BigButton
-          label="Grosimea pensulei"
+          label={t('desen.brush')}
           size={86}
           round
           onPress={() =>
@@ -195,7 +198,7 @@ export default function DesenGame({ voice, registerTest, profileId }: GameProps)
           <span className="block rounded-full bg-ink" style={{ width: size + 6, height: size + 6 }} />
         </BigButton>
         <BigButton
-          label="Abțibilduri"
+          label={t('desen.stickers')}
           size={86}
           round
           tone="white"
@@ -205,7 +208,7 @@ export default function DesenGame({ voice, registerTest, profileId }: GameProps)
         >
           <Emoji name="glowing-star" size={56} />
         </BigButton>
-        <BigButton label="Înapoi un pas" size={86} round onPress={() => ink.current?.undo()}>
+        <BigButton label={t('undo')} size={86} round onPress={() => ink.current?.undo()}>
           <UndoIcon />
         </BigButton>
         <BigButton
@@ -220,14 +223,14 @@ export default function DesenGame({ voice, registerTest, profileId }: GameProps)
               setConfirmClear(false);
             } else {
               setConfirmClear(true);
-              void voice.say('desen.clear');
+              void voice.say('desen.clear', 'now');
             }
           }}
         >
           {confirmClear ? <CheckIcon size={50} /> : <TrashIcon size={50} />}
         </BigButton>
         <BigButton
-          label="Pune în album"
+          label={t('toAlbum')}
           size={86}
           round
           tone="lagoon"
@@ -258,7 +261,7 @@ export default function DesenGame({ voice, registerTest, profileId }: GameProps)
                   const svg = e.currentTarget.querySelector('svg');
                   if (svg) setStamp(svgUrl(svg));
                   setStamps(false);
-                  void voice.say('desen.stamp');
+                  void voice.say('desen.stamp', 'now');
                 }}
               >
                 <G size={92} />
@@ -274,7 +277,7 @@ export default function DesenGame({ voice, registerTest, profileId }: GameProps)
               onClick={() => {
                 setStamp(emojiUrl(n));
                 setStamps(false);
-                void voice.say('desen.stamp');
+                void voice.say('desen.stamp', 'now');
               }}
             >
               <Emoji name={n} size={72} />

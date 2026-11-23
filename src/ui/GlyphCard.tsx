@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
+import { useT } from '../i18n/ui';
 
 /** The big letter / digit, appearing with a little magic. Tapping it says it again. */
 export function GlyphCard({
@@ -15,11 +16,12 @@ export function GlyphCard({
   color?: string;
   testId?: string;
 }) {
+  const t = useT();
   return (
     <motion.button
       key={glyph}
       type="button"
-      aria-label={`Litera sau cifra ${glyph}, atinge s-o auzi`}
+      aria-label={t('glyph.card', { x: glyph })}
       data-testid={testId}
       onClick={onPress}
       initial={{ scale: 0.3, rotate: -15, opacity: 0 }}

@@ -2,12 +2,14 @@ import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { voice } from '../audio/voice';
 import { useProfile } from '../core/profile';
+import { useT } from '../i18n/ui';
 import { LockIcon } from './icons';
 
 export const HOLD_MS = 3000;
 
 /** Small corner lock: hold for 3 s, then the PIN pad. A child's quick tap only says "ask a parent". */
-export function LockButton({ onUnlock }: { onUnlock(): void }) {
+export function LockButton({ onUnlock, testId = 'lock' }: { onUnlock(): void; testId?: string }) {
+  const t = useT();
   const [holding, setHolding] = useState(false);
   const [pad, setPad] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -24,7 +26,7 @@ export function LockButton({ onUnlock }: { onUnlock(): void }) {
   const end = () => {
     if (timer.current) clearTimeout(timer.current);
     timer.current = null;
-    if (holding && Date.now() - started.current < 600) void voice.say('parent.ask');
+    if (holding && Date.now() - started.current < 600) void voice.say('parent.ask', 'now');
     setHolding(false);
   };
   useEffect(
@@ -38,8 +40,8 @@ export function LockButton({ onUnlock }: { onUnlock(): void }) {
     <>
       <button
         type="button"
-        aria-label="Zona părinților (ține apăsat 3 secunde)"
-        data-testid="lock"
+        aria-label={t('gate.hold')}
+        data-testid={testId}
         onPointerDown={start}
         onPointerUp={end}
         onPointerLeave={end}
@@ -79,6 +81,7 @@ export function LockButton({ onUnlock }: { onUnlock(): void }) {
 }
 
 export function PinPad({ onSuccess, onCancel }: { onSuccess(): void; onCancel(): void }) {
+  const t = useT();
   const pin = useProfile((s) => s.pin);
   const [entry, setEntry] = useState('');
   const [wrong, setWrong] = useState(0);
@@ -102,8 +105,8 @@ export function PinPad({ onSuccess, onCancel }: { onSuccess(): void; onCancel():
         animate={wrong ? { x: [0, -14, 14, -8, 8, 0] } : undefined}
         className="w-[340px] rounded-3xl bg-paper p-6 text-center shadow-2xl"
       >
-        <h2 className="text-2xl font-semibold">Zona părinților</h2>
-        <p className="mt-1 text-sm text-ink/70">Introdu codul PIN (implicit 0000)</p>
+        <h2 className="text-2xl font-semibold">{t('gate.title')}</h2>
+        <p className="mt-1 text-sm text-ink/70">{t('gate.pin')}</p>
         <div className="my-4 flex justify-center gap-3" aria-live="polite">
           {[0, 1, 2, 3].map((i) => (
             <span
@@ -120,7 +123,7 @@ export function PinPad({ onSuccess, onCancel }: { onSuccess(): void; onCancel():
               <button
                 key={i}
                 type="button"
-                aria-label={k === '⌫' ? 'Șterge' : k}
+                aria-label={k === '⌫' ? t('gate.erase') : k}
                 onClick={() => (k === '⌫' ? setEntry((e) => e.slice(0, -1)) : press(k))}
                 className="h-16 rounded-2xl bg-white text-2xl font-semibold shadow active:scale-95"
               >
@@ -130,7 +133,7 @@ export function PinPad({ onSuccess, onCancel }: { onSuccess(): void; onCancel():
           )}
         </div>
         <button type="button" onClick={onCancel} className="mt-4 text-base underline">
-          Renunță
+          {t('gate.cancel')}
         </button>
       </motion.div>
     </div>

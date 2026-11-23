@@ -6,6 +6,7 @@ import type { Mood } from '../../art/parts';
 import { sfx } from '../../audio/sfx';
 import { randomSeed, rng } from '../../core/rng';
 import type { GameProps } from '../../core/types';
+import { useT } from '../../i18n/ui';
 import { createArbiter } from '../../input/arbiter';
 import { DemoHand } from '../../ui/DemoHand';
 import type { LineId } from '../../voice/lines';
@@ -15,6 +16,7 @@ import { type DotsSkill, type DotsState, dotAt, type Picture, pickPicture, reach
 const HIT = 0.085; // reach radius, fraction of the board
 
 export default function PuncteGame({ level, onItem, voice, hints, registerTest }: GameProps) {
+  const t = useT();
   const skill = level.skill as DotsSkill;
   const rand = useRef(rng(randomSeed()));
   const [pic, setPic] = useState<Picture>(() => pickPicture(skill, rand.current));
@@ -57,7 +59,7 @@ export default function PuncteGame({ level, onItem, voice, hints, registerTest }
   const finish = async () => {
     setMood('happy');
     sfx.fanfare();
-    await voice.say(`dots.pic.${pic.id}` as LineId);
+    await voice.say(`dots.pic.${pic.id}` as LineId, 'now');
     await new Promise((r) => setTimeout(r, 900));
     await onItem({
       skill,
@@ -82,7 +84,7 @@ export default function PuncteGame({ level, onItem, voice, hints, registerTest }
       stRef.current = r.state;
       setSt(r.state);
       sfx.pop();
-      void voice.say(numberLine(i + 1));
+      void voice.say(numberLine(i + 1, level.lang), 'now');
       if (r.state.done) void finish();
     } else if (r.event === 'wrong') {
       mistakes.current += 1;
@@ -172,7 +174,7 @@ export default function PuncteGame({ level, onItem, voice, hints, registerTest }
           onPointerCancel={onUp}
           data-testid="dots-board"
           role="img"
-          aria-label="Unește punctele"
+          aria-label={t('dots.title')}
         >
           {/* the picture comes alive */}
           <AnimatePresence>

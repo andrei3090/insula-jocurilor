@@ -7,6 +7,7 @@ import { useProfile } from '../core/profile';
 import { useProgress } from '../core/progress';
 import { useRouter } from '../core/router';
 import { STICKERS } from '../core/stickers';
+import { useT } from '../i18n/ui';
 import { BigButton } from '../ui/BigButton';
 import { CheckIcon, HouseIcon, TrashIcon } from '../ui/icons';
 
@@ -14,6 +15,7 @@ import { CheckIcon, HouseIcon, TrashIcon } from '../ui/icons';
 const NONE: string[] = [];
 
 function DrawingCard({ d, onDeleted }: { d: Drawing; onDeleted(): void }) {
+  const t = useT();
   const [url] = useState(() => URL.createObjectURL(d.blob));
   const [confirm, setConfirm] = useState(false);
   useEffect(() => () => URL.revokeObjectURL(url), [url]);
@@ -21,13 +23,13 @@ function DrawingCard({ d, onDeleted }: { d: Drawing; onDeleted(): void }) {
     <div className="relative shrink-0">
       <img
         src={url}
-        alt="Desenul meu"
+        alt={t('album.drawing')}
         className="h-44 rounded-2xl border-4 border-ink/70 bg-white object-contain"
       />
       <div className="absolute -right-3 -top-3">
         {confirm ? (
           <BigButton
-            label="Da, șterge desenul"
+            label={t('album.deleteYes')}
             tone="coral"
             size={72}
             round
@@ -39,7 +41,7 @@ function DrawingCard({ d, onDeleted }: { d: Drawing; onDeleted(): void }) {
             <CheckIcon size={40} />
           </BigButton>
         ) : (
-          <BigButton label="Șterge desenul" tone="white" size={72} round onPress={() => setConfirm(true)}>
+          <BigButton label={t('album.delete')} tone="white" size={72} round onPress={() => setConfirm(true)}>
             <TrashIcon size={40} />
           </BigButton>
         )}
@@ -49,6 +51,7 @@ function DrawingCard({ d, onDeleted }: { d: Drawing; onDeleted(): void }) {
 }
 
 export function Album() {
+  const t = useT();
   const go = useRouter((s) => s.go);
   const profileId = useProfile((s) => s.activeId);
   const owned = useProgress((s) => s.stickers[profileId] ?? NONE);
@@ -58,6 +61,7 @@ export function Album() {
   useEffect(() => {
     refresh();
     void voice.say(owned.length ? 'album.title' : 'album.empty');
+    return () => voice.stop();
   }, [profileId]);
 
   return (
@@ -66,10 +70,17 @@ export function Album() {
       data-testid="album-screen"
     >
       <header className="sticky top-0 z-10 flex items-center gap-4 px-6 pt-5 pb-2">
-        <BigButton label="Harta" tone="sun" size={88} round onPress={() => go({ name: 'map' })} testId="home">
+        <BigButton
+          label={t('map')}
+          tone="sun"
+          size={88}
+          round
+          onPress={() => go({ name: 'map' })}
+          testId="home"
+        >
           <HouseIcon size={50} />
         </BigButton>
-        <h1 className="text-4xl font-semibold">Albumul meu</h1>
+        <h1 className="text-4xl font-semibold">{t('album.mine')}</h1>
         <span className="ml-auto rounded-full bg-white/80 px-4 py-1 text-2xl font-semibold">
           {owned.length} / {STICKERS.length}
         </span>
@@ -95,7 +106,7 @@ export function Album() {
               }`}
             >
               {have ? (
-                <Emoji name={s as EmojiName} size={84} label="abțibild" />
+                <Emoji name={s as EmojiName} size={84} label={t('album.sticker')} />
               ) : (
                 <span className="text-4xl text-ink/20">?</span>
               )}

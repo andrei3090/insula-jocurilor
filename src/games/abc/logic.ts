@@ -1,3 +1,4 @@
+import type { LevelSpec } from '../../core/levels';
 import { type Rand, sample, shuffle } from '../../core/rng';
 import { LETTERS, type LetterItem, startsWith } from './data';
 
@@ -61,3 +62,8 @@ export function soundOptions(
 
 /** In "sound" mode only letters with a picture that starts with them can be asked. */
 export const soundable = (l: LetterItem) => startsWith(l);
+
+/** Levels 1…25 meet the letters (3 + n in play); 26…50 "what starts with…?" over a growing set. */
+export function levelSpec(n: number): LevelSpec & { skill: AbcSkill; letters: number } {
+  return n <= 25 ? { skill: 'abc.meet', letters: 2 + n } : { skill: 'abc.sound', letters: 3 + (n - 26) };
+}

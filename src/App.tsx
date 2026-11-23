@@ -1,11 +1,12 @@
 import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { useEffect } from 'react';
 import { setVolume } from './audio/engine';
-import { setVoiceEnabled } from './audio/voice';
+import { setVoiceEnabled, setVoiceLang } from './audio/voice';
 import { useProfile } from './core/profile';
 import { gameById } from './core/registry';
 import { type Route, useRouter } from './core/router';
 import { maybeApplyUpdate } from './core/update';
+import { useLang } from './i18n/ui';
 import { Album } from './screens/Album';
 import { ArtSheet } from './screens/dev/ArtSheet';
 import { GameHost } from './screens/GameHost';
@@ -47,6 +48,11 @@ export function App() {
 
   useEffect(() => setVolume(volume), [volume]);
   useEffect(() => setVoiceEnabled(voiceOn), [voiceOn]);
+  const lang = useLang();
+  useEffect(() => {
+    setVoiceLang(lang);
+    document.documentElement.lang = lang;
+  }, [lang]);
   useEffect(() => maybeApplyUpdate(route.name), [route.name]);
 
   return (

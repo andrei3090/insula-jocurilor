@@ -5,6 +5,7 @@ import { IslandArt } from '../art/islands';
 import { sfx } from '../audio/sfx';
 import { voice } from '../audio/voice';
 import { useRouter } from '../core/router';
+import { type UiKey, useT } from '../i18n/ui';
 import { BigButton } from '../ui/BigButton';
 import { BookIcon } from '../ui/icons';
 import { LockButton } from '../ui/ParentGate';
@@ -14,10 +15,13 @@ let greeted = false;
 
 export function WorldMap() {
   const go = useRouter((s) => s.go);
+  const t = useT();
   const reduce = useReducedMotion();
   useEffect(() => {
     if (greeted) void voice.say('map.choose');
     greeted = true;
+    // leaving this screen is her own choice: what it was saying is over
+    return () => voice.stop();
   }, []);
   return (
     <div
@@ -34,7 +38,7 @@ export function WorldMap() {
               key={id}
               type="button"
               data-testid={`island-${id}`}
-              aria-label={info.name}
+              aria-label={t(`island.${id}` as UiKey)}
               onClick={() => {
                 sfx.pop();
                 go({ name: 'island', island: id });
@@ -52,7 +56,7 @@ export function WorldMap() {
                 </div>
               </div>
               <span className="-mt-2 rounded-full border-[3px] border-ink/70 bg-white/90 px-4 py-1 text-xl font-semibold">
-                {info.name}
+                {t(`island.${id}` as UiKey)}
               </span>
             </motion.button>
           );
@@ -60,7 +64,7 @@ export function WorldMap() {
       </div>
       <div className="absolute bottom-5 left-6 z-20">
         <BigButton
-          label="Albumul meu"
+          label={t('album.mine')}
           tone="castle"
           size={96}
           round

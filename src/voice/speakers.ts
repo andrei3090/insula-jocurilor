@@ -95,3 +95,23 @@ export const GEMINI: Record<
     sample: 'Ho, ho, ho! Eu sunt Tavi, uriașul mării! Hai în atelier, desenăm și colorăm tot ce vrei tu!',
   },
 };
+
+/**
+ * English clips: Kokoro-82M (Apache 2.0), made locally on the Mac, one voice per character; pitch is a small
+ * shift after synthesis (tempo kept), speed is Kokoro's own. Clips live in public/audio/en/.
+ */
+export const KOKORO: Record<Speaker, { voice: string; speed: number; pitch: number }> = {
+  // no pitch shift for the girls: a child learning English needs every word clear ("six", not "sex")
+  pufi: { voice: 'af_heart', speed: 0.95, pitch: 1 },
+  marina: { voice: 'af_bella', speed: 0.97, pitch: 1 },
+  cenusareasa: { voice: 'bf_emma', speed: 0.95, pitch: 1 },
+  bruno: { voice: 'am_michael', speed: 0.97, pitch: 1.06 },
+  tavi: { voice: 'am_fenrir', speed: 0.92, pitch: 0.96 },
+};
+export const KOKORO_MODEL = 'Kokoro-82M-v1.0-q8-soft-trim';
+
+/** Everything that changes the sound of an English clip (hashed into public/audio/en/manifest.json). */
+export const clipKeyEn = (id: string, text: string) => {
+  const k = KOKORO[speakerFor(id)];
+  return `kokoro|${KOKORO_MODEL}|${k.voice}|${k.speed}|${k.pitch}|${text}`;
+};

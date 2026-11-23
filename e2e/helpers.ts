@@ -79,6 +79,6 @@ export const traceGuide = (page: Page) =>
 
 declare global {
   interface Window {
-    __test?: { solve(): void; fail(): void };
+    __test?: { solve(): void; fail(): void; level?(n: number): void };
   }
 }
