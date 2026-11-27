@@ -36,8 +36,9 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,m4a,json}'],
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
         cleanupOutdatedCaches: true,
-        // the parent app has its own page; never answer its navigations with the child app
-        navigateFallbackDenylist: [/\/parinti\//],
+        // the parent app and the café puzzle have their own pages; never answer their navigations with the child app
+        navigateFallbackDenylist: [/\/parinti\//, /\/puzzle\//],
+        globIgnores: ['puzzle/**'],
       },
     }),
   ],

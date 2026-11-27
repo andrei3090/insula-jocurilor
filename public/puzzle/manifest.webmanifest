@@ -1,0 +1,11 @@
+{
+  "name": "Puzzle din Junglă · Craft Cafe",
+  "short_name": "Puzzle Junglă",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#2F4A2A",
+  "theme_color": "#2F4A2A",
+  "icons": [{ "src": "logo.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

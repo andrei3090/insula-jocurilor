@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#2F4A2A">
+<title>Puzzle din Junglă · Craft Cafe</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--cream:#FBF4E6;--green:#2F4A2A;--leaf:#596B43;--terra:#C85A2B;--gold:#F4C430;--brown:#5C3D22}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--green);color:var(--brown);
+  font-family:"Nunito","Avenir Next","Segoe UI",Roboto,Arial,sans-serif;user-select:none;-webkit-user-select:none;touch-action:none}
+button{font:inherit;border:0;cursor:pointer;touch-action:manipulation}
+.screen{position:fixed;inset:0;display:none}
+.screen.on{display:flex}
+/* ---------- acasă ---------- */
+#home{flex-direction:column;padding:2.2vh 2.5vw;background:radial-gradient(120% 90% at 20% 0%,#3f6136 0%,var(--green) 60%)}
+.top{display:flex;align-items:center;gap:2vw;color:var(--cream)}
+.top img{height:9vh;background:var(--cream);border-radius:2vh;padding:1vh 1.4vh}
+.top h1{font-size:6vh;line-height:1;font-weight:800;white-space:nowrap}
+.top p{font-size:2.6vh;opacity:.85;margin-top:.6vh}
+.levels{margin-left:auto;display:flex;gap:1vw}
+.lv{background:rgba(251,244,230,.14);color:var(--cream);border-radius:3vh;padding:1.4vh 2vw;font-size:3vh;font-weight:800;
+  border:.4vh solid transparent;display:flex;flex-direction:column;align-items:center;min-width:9vw}
+.lv small{font-size:1.9vh;font-weight:600;opacity:.85}
+.lv.on{background:var(--gold);color:var(--green);border-color:#fff}
+.grid{flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:1.6vw;margin-top:2.4vh;align-content:center}
+.pic{background:var(--cream);border-radius:2vh;padding:.8vh;box-shadow:0 1vh 2.4vh rgba(0,0,0,.35);transition:transform .15s}
+.pic:active{transform:scale(.96)}
+.pic img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:1.4vh;display:block}
+.pic span{display:block;text-align:center;font-weight:800;font-size:2.4vh;margin:.6vh 0 .2vh;color:var(--green)}
+/* ---------- joc ---------- */
+#game{background:radial-gradient(100% 100% at 30% 30%,#3a5a32,#22381f)}
+#bar{position:absolute;left:0;right:0;top:0;height:8vh;display:flex;align-items:center;gap:1.2vw;padding:0 2vw;color:var(--cream);z-index:5}
+.btn{background:var(--cream);color:var(--green);border-radius:4vh;padding:1.2vh 2.4vw;font-size:2.8vh;font-weight:800;box-shadow:0 .6vh 1.4vh rgba(0,0,0,.3)}
+.btn.ghost{background:rgba(251,244,230,.16);color:var(--cream)}
+#count{margin-left:auto;font-size:3vh;font-weight:800}
+#board{position:absolute;border-radius:1.6vh;background:rgba(0,0,0,.28);box-shadow:inset 0 0 0 .5vh rgba(251,244,230,.35)}
+#ghost{position:absolute;inset:0;border-radius:1.6vh;background-size:cover;opacity:.22;transition:opacity .3s}
+.cell{position:absolute;border:.25vh dashed rgba(251,244,230,.35);border-radius:.8vh}
+.piece{position:absolute;border-radius:1.1vh;box-shadow:0 .8vh 1.8vh rgba(0,0,0,.45),0 0 0 .4vh rgba(255,255,255,.9) inset;
+  touch-action:none;will-change:transform;transform-origin:0 0;transition:box-shadow .15s}
+.piece.drag{box-shadow:0 2.4vh 4vh rgba(0,0,0,.55),0 0 0 .5vh var(--gold) inset;z-index:1000!important}
+.piece.done{box-shadow:none;border-radius:0;pointer-events:none;animation:pop .35s ease}
+@keyframes pop{0%{filter:brightness(1.6)}100%{filter:none}}
+#win{position:absolute;top:0;bottom:0;right:0;width:36%;display:none;flex-direction:column;align-items:center;justify-content:center;gap:2vh;z-index:2000}
+#win .row{flex-direction:column;align-items:stretch}
+#win.on{display:flex}
+#win h2{font-size:14vh;color:var(--gold);text-shadow:0 .8vh 0 var(--green),0 1.4vh 3vh rgba(0,0,0,.5);font-weight:900}
+#win .row{display:flex;gap:2vw;margin-top:2vh}
+#win .btn{font-size:3.6vh;padding:2vh 3.4vw}
+canvas#fx{position:absolute;inset:0;pointer-events:none;z-index:1999}
+</style>
+</head>
+<body>
+<section id="home" class="screen on">
+  <div class="top">
+    <img src="logo.svg" alt="Craft Cafe">
+    <div><h1>Puzzle din Junglă</h1><p>Alege o poză, apoi trage piesele la locul lor.</p></div>
+    <div class="levels" id="levels"></div>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<section id="game" class="screen">
+  <div id="bar">
+    <button class="btn" id="back">‹ Înapoi</button>
+    <button class="btn ghost" id="hint">👁 Arată poza</button>
+    <button class="btn ghost" id="snd">🔊</button>
+    <div id="count"></div>
+  </div>
+  <div id="board"><div id="ghost"></div></div>
+  <canvas id="fx"></canvas>
+  <div id="win"><h2>Bravo!</h2><div class="row">
+    <button class="btn" id="again">↻ Încă o dată</button><button class="btn" id="other">🖼 Altă poză</button></div></div>
+</section>
+
+<script>
+const PICS=[['dimineata','Dimineața'],['gorila','Gorila'],['pantera','Pantera'],['caracatita','Caracatița'],['licurici','Licuricii'],
+ ['frunza','Sub frunză'],['curcubeu','Curcubeul'],['tucan','Tucanul'],['broscute','Broscuțele'],['prietenii','Prietenii'],
+ ['cufarul','Cufărul'],['comoara','Comoara'],['muralul','Muralul nostru']];
+const LEVELS=[[2,2,'4','foarte ușor'],[3,2,'6','ușor'],[3,3,'9','mediu'],[4,3,'12','greu'],[5,4,'20','campion']];
+const $=s=>document.querySelector(s);
+let level=1, pic=PICS[0], pieces=[], placed=0, sound=true, idle;
+// ---------- acasă ----------
+function home(){
+  $('#levels').innerHTML=LEVELS.map((l,i)=>`<button class="lv${i===level?' on':''}" data-i="${i}">${l[2]} piese<small>${l[3]}</small></button>`).join('');
+  $('#grid').innerHTML=PICS.map((p,i)=>`<button class="pic" data-i="${i}"><img src="img/${p[0]}_mic.jpg" alt=""><span>${p[1]}</span></button>`).join('');
+  show('home');
+}
+$('#levels').addEventListener('click',e=>{const b=e.target.closest('.lv');if(!b)return;level=+b.dataset.i;home();});
+$('#grid').addEventListener('click',e=>{const b=e.target.closest('.pic');if(!b)return;pic=PICS[+b.dataset.i];start();});
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));}
+// ---------- joc ----------
+let B={x:0,y:0,w:0,h:0}, tray={x:0,y:0,w:0,h:0};
+function layout(){
+  const W=innerWidth,H=innerHeight,top=H*.1,pad=W*.02;
+  const bw=Math.min(W*.6,(H-top-pad)*16/9), bh=bw*9/16;
+  B={x:pad,y:top+(H-top-pad-bh)/2,w:bw,h:bh};
+  tray={x:B.x+B.w+pad,y:top,w:W-(B.x+B.w)-pad*2,h:H-top-pad};
+  Object.assign($('#board').style,{left:B.x+'px',top:B.y+'px',width:B.w+'px',height:B.h+'px'});
+  $('#ghost').style.backgroundImage=`url(img/${pic[0]}.jpg)`;
+  const c=$('#fx'); c.width=W; c.height=H;
+}
+function start(){
+  show('game'); $('#win').classList.remove('on'); clearTimeout(idle);
+  layout();
+  const [cols,rows]=LEVELS[level];
+  document.querySelectorAll('.piece,.cell').forEach(n=>n.remove());
+  pieces=[]; placed=0;
+  const board=$('#board'), pw=B.w/cols, ph=B.h/rows;
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const cell=document.createElement('div'); cell.className='cell';
+    Object.assign(cell.style,{left:c*pw+'px',top:r*ph+'px',width:pw+'px',height:ph+'px'}); board.appendChild(cell);
+    const el=document.createElement('div'); el.className='piece';
+    Object.assign(el.style,{width:pw+'px',height:ph+'px',backgroundImage:`url(img/${pic[0]}.jpg)`,
+      backgroundSize:`${B.w}px ${B.h}px`,backgroundPosition:`${-c*pw}px ${-r*ph}px`});
+    // poziție aleatoare în zona din dreapta (sau sub tablă pe ecrane înguste)
+    const p={el,c,r,pw,ph,x:0,y:0,s:1,done:false,slot:0};
+    document.querySelector('#game').appendChild(el); pieces.push(p); bind(p);
+  }
+  // amestecă piesele și le așază într-o grilă în dreapta, micșorate cât să încapă
+  const order=pieces.map((_,i)=>i).sort(()=>Math.random()-.5);
+  const n=pieces.length, pw0=pieces[0].pw, ph0=pieces[0].ph;
+  let tc=1; while(Math.ceil(n/tc)*(tray.w/tc)*ph0/pw0>tray.h) tc++;
+  const tr=Math.ceil(n/tc), cw=tray.w/tc, ch=tray.h/tr;
+  const sc=Math.min(1,(cw*.9)/pw0,(ch*.9)/ph0);
+  order.forEach((pi,k)=>{const p=pieces[pi]; p.s=sc; p.home=sc;
+    p.x=tray.x+(k%tc)*cw+(cw-pw0*sc)/2+(Math.random()-.5)*cw*.06;
+    p.y=tray.y+Math.floor(k/tc)*ch+(ch-ph0*sc)/2+(Math.random()-.5)*ch*.06; move(p);});
+  $('#ghost').style.opacity=level<=1?.3:.18;
+  count();
+}
+function move(p){p.el.style.transform=`translate(${p.x}px,${p.y}px) scale(${p.done?1:p.s}) rotate(${p.done?0:((p.c*7+p.r*13)%9-4)/2}deg)`;}
+let z=10;
+function bind(p){
+  let id=null,ox=0,oy=0;
+  p.el.addEventListener('pointerdown',e=>{
+    if(p.done||id!==null)return; id=e.pointerId; try{p.el.setPointerCapture(id);}catch(_){}
+    const fx=(e.clientX-p.x)/p.s, fy=(e.clientY-p.y)/p.s;   // punctul apucat, în coordonatele piesei
+    p.s=1; ox=fx; oy=fy; p.x=e.clientX-ox; p.y=e.clientY-oy; move(p);
+    p.el.classList.add('drag'); p.el.style.zIndex=++z; poke();
+  });
+  p.el.addEventListener('pointermove',e=>{if(e.pointerId!==id)return; p.x=e.clientX-ox; p.y=e.clientY-oy; move(p);});
+  const end=e=>{
+    if(e.pointerId!==id)return; id=null; p.el.classList.remove('drag');
+    const tx=B.x+p.c*p.pw, ty=B.y+p.r*p.ph;
+    if(Math.hypot(p.x-tx,p.y-ty)<Math.min(p.pw,p.ph)*.42){
+      p.x=tx;p.y=ty;p.done=true;p.el.classList.add('done');p.el.style.zIndex=1;move(p);placed++;chime(placed===pieces.length);count();
+      if(placed===pieces.length) win();
+    } else {  // ține piesa pe ecran; în zona din dreapta revine la mărimea mică
+      if(p.x>B.x+B.w) p.s=p.home;
+      p.x=Math.min(Math.max(p.x,0),innerWidth-p.pw); p.y=Math.min(Math.max(p.y,innerHeight*.09),innerHeight-p.ph); move(p);
+    }
+  };
+  p.el.addEventListener('pointerup',end); p.el.addEventListener('pointercancel',end);
+}
+function count(){$('#count').textContent=`${placed} / ${pieces.length}`;}
+$('#back').onclick=()=>home();
+$('#hint').onpointerdown=()=>{$('#ghost').style.opacity=.9;};
+['pointerup','pointerleave','pointercancel'].forEach(ev=>$('#hint').addEventListener(ev,()=>{$('#ghost').style.opacity=level<=1?.3:.18;}));
+$('#snd').onclick=()=>{sound=!sound;$('#snd').textContent=sound?'🔊':'🔇';};
+$('#again').onclick=()=>start(); $('#other').onclick=()=>home();
+addEventListener('resize',()=>{if($('#game').classList.contains('on'))start();});
+addEventListener('contextmenu',e=>e.preventDefault());
+// după 3 minute fără atingere, revine la pagina de start (tabla e publică)
+function poke(){clearTimeout(idle); idle=setTimeout(home,180000);}
+addEventListener('pointerdown',poke);
+// ---------- sunet scurt (WebAudio, fără fișiere) ----------
+let ac;
+function chime(big){
+  if(!sound)return; ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+  const notes=big?[523,659,784,1047]:[784,1047];
+  notes.forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;
+    const t=ac.currentTime+i*.09;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.18,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.35);
+    o.connect(g).connect(ac.destination);o.start(t);o.stop(t+.4);});
+}
+// ---------- final ----------
+function win(){
+  $('#ghost').style.opacity=1; setTimeout(()=>{$('#win').classList.add('on');confetti();},400); poke();
+}
+function confetti(){
+  const c=$('#fx'),x=c.getContext('2d'),cols=['#F4C430','#C85A2B','#FBF4E6','#8FBF5A','#5FB3D9'];
+  const P=Array.from({length:160},()=>({x:Math.random()*c.width,y:-Math.random()*c.height*.5,v:2+Math.random()*4,s:6+Math.random()*10,
+    a:Math.random()*6,w:(Math.random()-.5)*.2,col:cols[Math.floor(Math.random()*cols.length)]}));
+  let t=0;(function f(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.y+=p.v;p.a+=p.w;x.save();x.translate(p.x+Math.sin(p.a)*20,p.y);x.rotate(p.a);
+    x.fillStyle=p.col;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore();});if(++t<260)requestAnimationFrame(f);else x.clearRect(0,0,c.width,c.height);})();
+}
+home();
+</script>
+</body>
+</html>

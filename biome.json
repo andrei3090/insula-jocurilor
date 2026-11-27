@@ -6,6 +6,7 @@
       "!dist",
       "!dev-dist",
       "!public/audio",
+      "!public/puzzle",
       "!.voice-gemini",
       "!.probe",
       "!test-results",

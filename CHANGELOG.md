@@ -1,5 +1,9 @@
 # Ce e nou
 
+## Pagină separată: Puzzle din Junglă (28.11.2026)
+
+- La adresa /insula-jocurilor/puzzle/ e un puzzle pentru tabla interactivă din cafenea: 13 poze din junglă și muralul nostru, 4–20 de piese, mai mulți copii pot trage piese în același timp. Pagina nu salvează nimic și nu are legătură cu profilurile din aplicație.
+
 ## 0.8.0 (23.11.2026)
 
 - După „Hai să ne jucăm!” copilul alege câți ani are: 3–4 ani sau 5–7 ani. Insulele arată apoi jocurile potrivite vârstei (vârsta exactă se poate pune și în zona părinților).
